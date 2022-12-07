@@ -362,7 +362,7 @@ class DashECGSignal(ECG):
             x=self.RRSignal.poincare.xi,
             y=self.RRSignal.poincare.xii,
             mode='markers',
-            marker=dict(size=12, color='black', opacity='0.2'),
+            marker=dict(size=12, color='black', opacity=0.2),
             name='Poincare plot'
         )],
             'layout': go.Layout(

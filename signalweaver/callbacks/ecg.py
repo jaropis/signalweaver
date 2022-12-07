@@ -119,7 +119,7 @@ def on_right_left_peak_or_pp_click(n_clicked_right=10000, n_clicked_left=10000, 
     ecg.update_window_length(window)
 
     # decide whether to move right or left by one window length
-    ecg.step_right_left(int(n_clicked_right), int(n_clicked_left))
+    ecg.step_right_left(int(n_clicked_right), int(n_clicked_left) if n_clicked_left != '' else 0)
     # now deciding whether anything has been clicked on the poincare plot
     ecg.set_position_on_pp_click(click_data)
     return ecg.ecg_and_peak_traces()
