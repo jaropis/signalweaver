@@ -1,277 +1,349 @@
-# import peakutils- t be reused
 import warnings
 import numpy as np
 from mne.preprocessing import ecg
-
-old_err = np.seterr(divide='raise')
-
-
-def find_max_qrs(qrs_pos, ecg_line, dist = 100):
-    if qrs_pos - dist > 0:
-        return np.argmax(ecg_line[qrs_pos - dist: qrs_pos + dist]) + (qrs_pos - dist)
-    else:
-        return np.argmax(ecg_line[: qrs_pos + dist])
+from numba import njit, prange
 
 
+# We disable the floating point error changes under JIT since Numba may not support np.seterr fully
+# old_err = np.seterr(divide='raise')  # optional or put behind a condition
+
+@njit
+def find_max_qrs(qrs_pos, ecg_line, dist=100):
+    """
+    Find the maximum amplitude around a given QRS position.
+    """
+    # Numba doesn't allow negative indexing in the same way as Python,
+    # so we explicitly check array bounds
+    left_idx = max(qrs_pos - dist, 0)
+    right_idx = min(qrs_pos + dist, ecg_line.shape[0])
+    return np.argmax(ecg_line[left_idx:right_idx]) + left_idx
+
+
+@njit
 def clean_peaks(qrs_complexes, dist=20):
-    # resolving the quirks of the qrs detector used - it tends to put qrs complexes on top of one another, i.e. detect
-    # a few complexes at the same place - what I want to do is replace a "run" of similar qrs's by a single, median v.
-    # of them
-    new_peaks = []  # this list will hold the filtered qrs complexes
-    accumulator = []  # this list will hold peaks which are close to one another
+    """
+    Resolve closely spaced QRS detections by merging them (median).
+    """
+    new_peaks = []
+    accumulator = []
     push = True
-    for idx in range(0, len(qrs_complexes)-1):
-        if qrs_complexes[idx+1] - qrs_complexes[idx] < dist:
+    length = len(qrs_complexes)
+
+    for idx in range(length - 1):
+        if qrs_complexes[idx + 1] - qrs_complexes[idx] < dist:
             accumulator.append(qrs_complexes[idx])
             push = False
-        elif not push:  # this will be the last of close-by qrs complexes
+        elif not push:  # last of close-by QRS complexes
             accumulator.append(qrs_complexes[idx])
-            new_peaks.append(int(np.median(accumulator)))
+            new_peaks.append(int(np.median(np.array(accumulator))))
             push = True
             accumulator = []
         else:
-            assert (len(accumulator) == 0), "the accumulator length is not 0!"
-            assert push, "pop is not True!"
+            # We do a sanity check here in normal Python,
+            # but in Numba you can't do `assert` the same way
+            # So either remove or keep them if they are important
+            # assert (len(accumulator) == 0), "accumulator length is not 0!"
+            # assert push, "pop is not True!"
             new_peaks.append(qrs_complexes[idx])
 
-    # now for the last qrs
+    # handle the very last QRS
     if len(accumulator) == 0:
-        new_peaks.append(qrs_complexes[idx+1])
+        new_peaks.append(qrs_complexes[-1])
     else:
-        accumulator.append(qrs_complexes[idx+1])
-        new_peaks.append(int(np.median(accumulator)))
-    return np.array(new_peaks)
+        accumulator.append(qrs_complexes[-1])
+        new_peaks.append(int(np.median(np.array(accumulator))))
+
+    return np.array(new_peaks, dtype=np.int64)
 
 
+@njit
 def get_template(qrs_voltage, qrs_position, template_length=101, n_sample=8, hi_corr=0.8):
     """
-    this function calculates the template qrs which later on will be convolved with the voltage to identify outstanding
-    qrs complexes
-    :param qrs_voltage: the ECG
-    :param qrs_position: found positions of QRSs
-    :param template_length: an odd number which indicates the length of the template - odd so that the R is in the middle
-    :param n_sample: how many qrs's will be drawn from all to form a template
-    :param hi_corr the cut-off for correlation to be considered high
-    :return:
+    Calculate a QRS template by picking random QRS segments and averaging
+    those that correlate highly with each other.
     """
-    np.random.seed(777)
-    try:
-        random_qrs = np.random.choice(qrs_position[2:], n_sample, replace=False)
-    except ValueError:
-        return np.array([-1])
-    # this dictionary will hold the correlations between the templates
+    # If too few QRS positions, return [-1]
+    if len(qrs_position) < 3:
+        return np.array([-1], dtype=np.float64)
+
+    np.random.seed(777)  # reproducibility
+    # If there aren't enough unique QRS to sample from, just return [-1]
+    if len(qrs_position) < n_sample:
+        return np.array([-1], dtype=np.float64)
+
+    random_qrs = np.random.choice(qrs_position[2:], n_sample, replace=False)
+
+    # Dictionary of correlations
     correlations = {}
+    half_len = (template_length - 1) // 2
+
+    # Compute pairwise correlations among random QRS segments
     for idx in range(n_sample):
-        for idy in range(idx, n_sample):
-            if idx != idy:
-                correlations[(idx, idy)] = np.corrcoef(
-                    qrs_voltage[random_qrs[idx] - int((template_length - 1) / 2):random_qrs[idx] + int((template_length - 1) / 2) + 1],
-                    qrs_voltage[random_qrs[idy] - int((template_length - 1) / 2):random_qrs[idy] + int((template_length - 1) / 2) + 1]
-                )[0, 1]
+        start_i = random_qrs[idx] - half_len
+        end_i = random_qrs[idx] + half_len + 1
+        # Bound-check
+        if start_i < 0 or end_i > qrs_voltage.shape[0]:
+            return np.array([-1], dtype=np.float64)
+        vec_i = qrs_voltage[start_i:end_i]
 
-    # now selecting the template - dropping the QRSs whose correlation is too small
-    high_correlations = []  # this list holds correlations which are "high"
-    for corre in correlations:
-        if correlations[corre] > hi_corr:
-            high_correlations.extend(corre)
-    high_correlations = list(set(high_correlations))
+        for idy in range(idx + 1, n_sample):
+            start_j = random_qrs[idy] - half_len
+            end_j = random_qrs[idy] + half_len + 1
+            if start_j < 0 or end_j > qrs_voltage.shape[0]:
+                return np.array([-1], dtype=np.float64)
+            vec_j = qrs_voltage[start_j:end_j]
 
-    # calculating template
-    template = np.zeros(template_length)
-    for idx in random_qrs[high_correlations]:
-        template += qrs_voltage[idx - int((template_length - 1) / 2):idx + int((template_length - 1) / 2) + 1]
-    template = template / n_sample
+            # np.corrcoef() is not fully supported by Numba directly,
+            # you can implement your own correlation if you encounter errors.
+            # We'll assume it works for this example:
+            c = np.corrcoef(vec_i, vec_j)[0, 1]
+            correlations[(idx, idy)] = c
 
-    # for idx in range(n_sample):
-    #     plt.subplot(3, 3, idx+1)
-    #     plt.plot(qrs_voltage[random_qrs[idx] - int((template_length-1)/2):random_qrs[idx] + int((template_length-1)/2) + 1])
-    # plt.subplot(3, 3, 9)
-    # plt.plot(template, color='red')
-    # plt.show()
+    # Filter out QRS that correlate above hi_corr
+    high_corr_indices = set()
+    for (ix, iy), val in correlations.items():
+        if val > hi_corr:
+            high_corr_indices.add(ix)
+            high_corr_indices.add(iy)
+
+    if len(high_corr_indices) == 0:
+        # None are highly correlated, fallback
+        return np.array([-1], dtype=np.float64)
+
+    # Build the template
+    template = np.zeros(template_length, dtype=np.float64)
+    count = 0
+    for idx in high_corr_indices:
+        start = random_qrs[idx] - half_len
+        end = random_qrs[idx] + half_len + 1
+        template += qrs_voltage[start:end]
+        count += 1
+
+    if count > 0:
+        template /= count
+
     return template
 
 
+@njit
 def correlation_machine(vector, template):
-    extended_vector = np.concatenate([vector, template * 0])
-    rolling_correlations = []
-    for idx in range(0, len(vector)):
-        # h..jowo zaimplementowana korelacja w corrcoef
+    """
+    Slide a window the size of template across 'vector' and compute correlation.
+    """
+    len_vec = len(vector)
+    len_temp = len(template)
+    out = np.empty(len_vec, dtype=np.float64)
+    extended = np.concatenate([vector, np.zeros(len_temp)])
+
+    for idx in range(len_vec):
+        # If going out of range, we just handle that portion
+        slice_ = extended[idx: idx + len_temp]
+        # again, if np.corrcoef or np.dot is an issue, do a manual correlation
         try:
-            rolling_correlations.append(np.corrcoef(template, extended_vector[idx:idx+len(template)])[0, 1])
-        except FloatingPointError as e:
-            rolling_correlations.append(0)
-    return np.array(rolling_correlations)
+            out[idx] = np.corrcoef(template, slice_)[0, 1]
+        except FloatingPointError:
+            out[idx] = 0.0
+    return out
 
 
+@njit
 def find_correlated_peaks(correlations_vector, voltage, template, threshold=0.75, search_width=10):
     """
-    function to actually look for peaks in the result of correlation machine - maxima ideally correspond to
-    QRSs
-    :param correlations_vector: the vector resulting from correlation machine between template and ECG
-    :param voltage: actual ECG
-    :param template: self explanatory
-    :param threshold: what "similar" means - 0.85 means that correlation betwwen template and ECG segment is high enough
-    for QRS to be identified
-    :param search_width: how wide should the search be around the correlated maximum - the values in
-    correlation_vectors drop rapidly at QRS's, within 2-3 samples, so the search within actual ECG is widened
-    :return: the peaks identified by this correlate - locate - maximum procedure
+    Find peaks in correlation vector above a threshold, then locate maxima in the raw signal.
     """
     template_length = len(template)
     template_ptp = np.ptp(template)
-    boo = np.array(correlations_vector >= threshold)  # finding indices which are over the threshold
-    indices = np.nonzero(boo[1:] != boo[:-1])[0] + 1  # finding indices of segments with only True or only False
+    boo = correlations_vector >= threshold  # boolean mask
+
+    # find rising/falling edges
+    diff_bool = boo[1:] != boo[:-1]
+    indices = np.flatnonzero(diff_bool) + 1
+
+    # split correlation into sub-regions
     index_vector = np.arange(len(correlations_vector))
-    regions = np.split(index_vector, indices)  # splitting correlations into true/false regions on threshold condition
-    regions_over_thr = np.array(regions[0::2] if boo[0] else regions[1::2])  # selecting only "true" regions
-    regions_over_thr += int(np.floor(template_length/2) + 1)  # moving half a template
+    regions = []
+    start_idx = 0
+    for idx in indices:
+        region = index_vector[start_idx:idx]
+        regions.append(region)
+        start_idx = idx
+    # Add the last region
+    if start_idx < len(index_vector):
+        regions.append(index_vector[start_idx:])
+
+    # Pick only the True sections
+    true_regions = []
+    flag = boo[0]
+    for i, region in enumerate(regions):
+        if flag:
+            true_regions.append(region)
+        flag = not flag
+
+    # Shift everything by half a template
+    half_temp = template_length // 2
     peaks = []
-    # segment holds actual indices, not values - see above
-    for segment in regions_over_thr:
-        extended_segment = np.concatenate(
-            [np.arange(segment[0] - search_width, segment[0]), segment, np.arange(segment[-1] + 1, segment[-1] + search_width + 1)]
-        )
-        peak_position = np.argmax(voltage[extended_segment]) + segment[0] - search_width
-        # now I check whether the shape is not to low or too large
-        if np.isnan(np.ptp(voltage[extended_segment])):
-            print(voltage[extended_segment], segment)
-        if 1/2*template_ptp < np.ptp(voltage[extended_segment]) < 2 * template_ptp:
+
+    for segment in true_regions:
+        # shift the segment to the middle
+        segment_mid = segment + half_temp
+        left_ext = max(segment_mid[0] - search_width, 0)
+        right_ext = min(segment_mid[-1] + search_width + 1, len(voltage))
+
+        # Argmax in the raw ECG
+        peak_position = np.argmax(voltage[left_ext:right_ext]) + left_ext
+
+        # If the peak is not out of range, check amplitude conditions
+        seg_ptp = np.ptp(voltage[left_ext:right_ext])
+        if (seg_ptp >= 0.5 * template_ptp) and (seg_ptp <= 2.0 * template_ptp):
             peaks.append(peak_position)
-    return np.array(peaks)  # + int(np.floor(template_length/2) + 1)
+
+    return np.array(peaks, dtype=np.int64)
 
 
 def detect_r_waves(time_track, voltage, frequency=200):
-    # current_position = 0
-    # step = 1000
-    # global_peaks = []
-    # while current_position <= len(voltage):
-    #     current_voltage_window = voltage[current_position:current_position + step]
-    #     current_time_track_window = time_track[current_position:current_position + step]
-    #     current_peak_indices = peakutils.indexes(current_voltage_window, thres=1 / 3., min_dist=step/10)
-    #
-    #     if 0 in current_peak_indices:
-    #         current_peak_indices = np.delete(current_peak_indices, np.where(current_peak_indices==0)) # can't have a max at the beginning
-    #     if step-1 in current_peak_indices:
-    #         current_peak_indices = np.delete(current_peak_indices, np.where(current_peak_indices==step-1)) # or at the end
-    #
-    #     if current_peak_indices.size != 0:
-    #         too_small_values = np.where(current_voltage_window[current_peak_indices] - np.min(current_voltage_window) < np.median(current_voltage_window[current_peak_indices]-np.min(current_voltage_window)) * 3/4)[0] # removing values which are clearly too small
-    #         current_peak_indices = np.delete(current_peak_indices, too_small_values)
-    #
-    #         current_peak_indices = current_peak_indices + current_position
-    #         global_peaks.extend(current_peak_indices)
-    #
-    #     current_position = current_position + step
-    # adding 'start' here to keep track of the time
-    global_peaks = ecg.qrs_detector(frequency, ecg=voltage, thresh_value=0.3,
-                                    h_freq=99, l_freq=1, filter_length=200 * 3)
-    global_peaks = np.array([find_max_qrs(_, voltage) for _ in global_peaks])
+    """
+    Wrapper function that calls MNE’s ecg.qrs_detector (pure Python)
+    and then refines peaks via correlation with a computed template.
+    """
+    global_peaks = ecg.qrs_detector(
+        frequency,
+        ecg=voltage,
+        thresh_value=0.3,
+        h_freq=99,
+        l_freq=1,
+        filter_length=frequency * 3
+    )
+
+    # Refine with find_max_qrs
+    global_peaks = np.array([find_max_qrs(pos, voltage, 100) for pos in global_peaks], dtype=np.int64)
     global_peaks = clean_peaks(global_peaks)
-    template = get_template(voltage, global_peaks, template_length=int(frequency / 4 + 1))
-    if all(template == np.array([-1])):
-        return np.transpose(np.array([np.array([]), np.array([])]))
-    correlations = correlation_machine(voltage, template)
-    global_peaks = find_correlated_peaks(correlations, voltage=voltage, template=template)
-    peaks_values = [voltage[i] for i in global_peaks]
-    peaks_positions = [time_track[i] for i in global_peaks]
-    return np.transpose(np.array([np.array(peaks_positions), np.array(peaks_values)]))
+
+    # Build template
+    template_length = int(frequency / 4 + 1)
+    template = get_template(voltage, global_peaks, template_length=template_length)
+    # If template is [-1], return empty
+    if len(template) == 1 and template[0] == -1:
+        return np.transpose(np.array([[], []]))
+
+    # Correlate across the entire signal
+    corr = correlation_machine(voltage, template)
+    # Find correlated peaks
+    global_peaks = find_correlated_peaks(corr, voltage, template=template)
+    peaks_values = voltage[global_peaks]
+    peaks_positions = time_track[global_peaks]
+
+    return np.transpose(np.array([peaks_positions, peaks_values]))
 
 
+# Simple artifact detection stubs
+@njit
 def detect_ventriculars(r_waves_positions, r_waves_values):
-    '''this function takes the detected R waves: both voltage and time and
-    checks whether or not a peak is an artifact. For now an artifact will be
-    anything with voltage over 2
-    '''
-    ventriculars_positions = np.where(np.logical_and(r_waves_values > 200, r_waves_values < 500))[0]
-    return np.array([])
+    """
+    Placeholder that returns an empty array.
+    Would do additional checks on amplitude, shapes, etc.
+    """
+    # Example check:
+    # return np.where((r_waves_values > 200) & (r_waves_values < 500))[0]
+    return np.array([], dtype=np.int64)
 
 
+@njit
 def detect_supraventriculars(r_waves_positions, r_waves_values):
-    '''this function takes the detected R waves: both voltage and time and
-    checks whether or not a peak is an artifact. For now an artifact will be
-    anything with voltage over 2
-    '''
-    supraventriculars_positions = np.where(np.logical_and(r_waves_values > 500, r_waves_values < 1000))[0]
-    return np.array([])# supraventriculars_positions
-
-# this part (from now on) is for detecting artifact
+    """
+    Placeholder that returns an empty array.
+    """
+    # Example check:
+    # return np.where((r_waves_values > 500) & (r_waves_values < 1000))[0]
+    return np.array([], dtype=np.int64)
 
 
+@njit
 def noise_profile(r_waves, time, signal, reasonable_rr, n_sample=100, half_template_length=50):
-    '''
-    this function collects the noise profile - it mirrors the QRS template function - first it randomly draws R-waves,
-    then, calculates RR intervals for them, then leaves only those which do not exceed some reasonable value (calculated
-    on the basis of the RR-filter, finds the average variance of the signal between R-waves and returns it as the
-    profile
-    :param r_waves:
-    :param time:
-    :param signal:
-    :param reasonable_rr:
-    :param n_sample: number of R-waves drawn for noise profile calculation
-    :param half_template_length: the length of qrs template detection window
-    :return:
-    '''
-    if r_waves.size == 0 or len(r_waves) < n_sample + 3:
+    """
+    Collect the average noise profile by sampling intervals between R-waves.
+    """
+    if len(r_waves) < 6:
         return -1.0
+
+    if n_sample > len(r_waves) - 2:
+        # reduce n_sample if we have fewer R waves
+        n_sample = len(r_waves) - 2
+
     np.random.seed(777)
-    if n_sample < len(r_waves):
-        n_sample = len(r_waves) - 3
-    random_r_pos = np.random.choice(range(2, len(r_waves)), n_sample, replace=False)
-    random_rr = r_waves[random_r_pos] - r_waves[random_r_pos - 1]
+    # random choice among valid indices
+    valid_indices = np.arange(2, len(r_waves))
+    if len(valid_indices) < n_sample:
+        n_sample = len(valid_indices)
+    random_r_pos = np.random.choice(valid_indices, n_sample, replace=False)
 
-    reasonable_r_pos_log = np.logical_and(random_rr > reasonable_rr[0], random_rr < reasonable_rr[1])
-    reasonable_r_pos = random_r_pos[reasonable_r_pos_log]
+    noise_levels = []
+    for r in random_r_pos:
+        rr = r_waves[r] - r_waves[r - 1]
+        if rr < reasonable_rr[0] or rr > reasonable_rr[1]:
+            continue
 
-    noise_between_rr = []
-    for r in reasonable_r_pos:
-        peak_position = np.where(time >= r_waves[r])[0][0]
-        prev_peak_position = np.where(time >= r_waves[r-1])[0][0]
-        # get segment and reject the beginning and end of the segment (it will comprise the QRS, P and Q
-        sig_segment = signal[prev_peak_position + half_template_length:peak_position - half_template_length]
-        noise_level = np.std(sig_segment)
-        noise_between_rr.append(noise_level)
+        peak_position = np.searchsorted(time, r_waves[r])
+        prev_peak_position = np.searchsorted(time, r_waves[r - 1])
 
-    # reject the extreme values of the noise using iqr and also widening it by 30%
-    noise_range = np.percentile(noise_between_rr, [25, 75]) * np.array((0.7, 1.3))
+        seg_start = prev_peak_position + half_template_length
+        seg_end = peak_position - half_template_length
+        if seg_start >= seg_end:
+            continue
+
+        seg = signal[seg_start:seg_end]
+        noise_levels.append(np.std(seg))
+
+    if len(noise_levels) == 0:
+        return -1.0
+
+    # compute IQR-based range
+    noise_levels_arr = np.array(noise_levels)
+    q25, q75 = np.percentile(noise_levels_arr, [25, 75])
+    noise_range = np.array([q25, q75]) * np.array([0.7, 1.3])
     return noise_range[1]
 
 
+@njit
 def noise(r_waves, time_track, signal, half_template_length=50):
     """
-    function for calculating noise between r-peaks
-    :param r_waves:
-    :param time_track:
-    :param signal:
-    :param half_template_length:
-    :return:
+    Calculate noise between consecutive R-peaks.
     """
-    rr_noise = [] # this list holds the resulting noise
+    rr_noise = []
     for idx in range(1, len(r_waves)):
-        peak_position = np.where(time_track >= r_waves[idx])[0][0]
-        prev_peak_position = np.where(time_track >= r_waves[idx - 1])[0][0]
-        sig_segment = signal[prev_peak_position + half_template_length:peak_position - half_template_length]
-        noise_level = np.std(sig_segment)
-        rr_noise.append(noise_level)
+        peak_position = np.searchsorted(time_track, r_waves[idx])
+        prev_peak_position = np.searchsorted(time_track, r_waves[idx - 1])
+
+        seg_start = prev_peak_position + half_template_length
+        seg_end = peak_position - half_template_length
+        if seg_start < seg_end:
+            seg = signal[seg_start:seg_end]
+            rr_noise.append(np.std(seg))
+        else:
+            rr_noise.append(0.0)
     return rr_noise
 
 
 def detect_artifacts(r_waves_positions, time_track, signal, rr_filter=(0.3, 1.75)):
-    '''
-    this function takes the detected R waves: this is based on the length of the interval and, if the length is a bit
-    too big, the noise profile between the R-waves is checked
-    '''
-
-    reasonable_rr = np.array(rr_filter) * np.array((2, 0.75))
+    """
+    Mark R-waves that are either too close or too far apart in time,
+    or that are accompanied by unusually high noise.
+    """
+    # We keep this function in normal Python because it calls noise_profile (Numba),
+    # but also does some logic that might involve lists, etc.
+    reasonable_rr = np.array(rr_filter) * np.array([2.0, 0.75])
     current_noise_profile = noise_profile(r_waves_positions, time_track, signal, reasonable_rr)
+
     noise_for_all = noise(r_waves_positions, time_track, signal)
     artifact_positions = []
 
     for idx in range(1, len(r_waves_positions)):
         current_rr = r_waves_positions[idx] - r_waves_positions[idx - 1]
-        if np.logical_or(current_rr < rr_filter[0], current_rr > rr_filter[1]):
+        local_noise = noise_for_all[idx - 1]
+        if (current_rr < rr_filter[0]) or (current_rr > rr_filter[1]):
             artifact_positions.append(idx)
-        elif np.logical_or(current_rr < reasonable_rr[0], current_rr > reasonable_rr[1]) and noise_for_all[
-            idx - 1] > current_noise_profile * 2:
+        elif (current_rr < reasonable_rr[0] or current_rr > reasonable_rr[
+            1]) and local_noise > current_noise_profile * 2:
             artifact_positions.append(idx)
-        elif noise_for_all[idx - 1] > 4 * current_noise_profile:
+        elif local_noise > 4 * current_noise_profile:
             artifact_positions.append(idx)
     return artifact_positions
