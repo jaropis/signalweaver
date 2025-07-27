@@ -62,6 +62,25 @@ class DashECGSignal(ECG):
         self.poincare_range_start = max(0, min_val - (max_val - min_val) * 0.05)  # Start from 0 or slightly below min
         self.poincare_range_end = max_val + (max_val - min_val) * 0.05  # Add small margin
 
+    def _format_time_for_tooltip(self, time_in_seconds):
+        """
+        Format time for tooltips based on duration:
+        - Under 1 minute: show only seconds
+        - 1 minute to 1 hour: show minutes and seconds
+        - Over 1 hour: show hours, minutes and seconds
+        """
+        if time_in_seconds < 60:
+            return f"{time_in_seconds:.3f} s"
+        elif time_in_seconds < 3600:
+            minutes = int(time_in_seconds // 60)
+            seconds = time_in_seconds % 60
+            return f"{minutes}:{seconds:06.3f}"
+        else:
+            hours = int(time_in_seconds // 3600)
+            minutes = int((time_in_seconds % 3600) // 60)
+            seconds = time_in_seconds % 60
+            return f"{hours}:{minutes:02d}:{seconds:06.3f}"
+
     def get_current_time_track(self):
         position = self.position - self.get_initial_position()
         return self.time_track[int(position / self.sampling_period):
@@ -279,6 +298,7 @@ class DashECGSignal(ECG):
                     mode='lines',
                     line=dict(color='black'),
                     name="ECG trace",
+                    hovertemplate='<extra></extra>'
                 ),
                 go.Scatter(
                     x=x_r_waves[self.folded_indices(x_r_waves, line_indices_down, local_indices_up,
@@ -289,7 +309,11 @@ class DashECGSignal(ECG):
                       self.offset_over_trace - idx * line_shift,
                     mode='markers',
                     marker=dict(size=12, color='green'),
-                    name='Detected R-peaks'
+                    name='Detected R-peaks',
+                    customdata=[self._format_time_for_tooltip(t) for t in x_r_waves[self.folded_indices(x_r_waves, line_indices_down, local_indices_up, starting_sample)] - current_x_shift],
+                    hovertemplate='<b>Normal beat</b><br>' +
+                                 'Time: %{customdata}<br>' +
+                                 '<extra></extra>'
                 ),
                 go.Scatter(
                     x=x_ventriculars[self.folded_indices(x_ventriculars, line_indices_down, local_indices_up,
@@ -299,7 +323,11 @@ class DashECGSignal(ECG):
                                                           starting_sample)] - y_baseline) / y_max + self.offset_over_trace - idx * line_shift,
                     mode='markers',
                     marker=dict(size=12, color='blue'),
-                    name='Detected ven.'
+                    name='Detected ven.',
+                    customdata=[self._format_time_for_tooltip(t) for t in x_ventriculars[self.folded_indices(x_ventriculars, line_indices_down, local_indices_up, starting_sample)] - current_x_shift],
+                    hovertemplate='<b>Ventricular beat</b><br>' +
+                                 'Time: %{customdata}<br>' +
+                                 '<extra></extra>'
                 ),
                 go.Scatter(
                     x=x_supraventriculars[
@@ -310,7 +338,11 @@ class DashECGSignal(ECG):
                                                                starting_sample)] - y_baseline) / y_max + self.offset_over_trace - idx * line_shift,
                     mode='markers',
                     marker=dict(size=12, color='magenta'),
-                    name='Detected sup.'
+                    name='Detected sup.',
+                    customdata=[self._format_time_for_tooltip(t) for t in x_supraventriculars[self.folded_indices(x_supraventriculars, line_indices_down, local_indices_up, starting_sample)] - current_x_shift],
+                    hovertemplate='<b>Supraventricular beat</b><br>' +
+                                 'Time: %{customdata}<br>' +
+                                 '<extra></extra>'
                 ),
                 go.Scatter(
                     x=x_artifacts[self.folded_indices(x_artifacts, line_indices_down, local_indices_up,
@@ -320,7 +352,11 @@ class DashECGSignal(ECG):
                                                        starting_sample)] - y_baseline) / y_max + self.offset_over_trace - idx * line_shift,
                     mode='markers',
                     marker=dict(size=12, color='red'),
-                    name='Detected art.'
+                    name='Detected art.',
+                    customdata=[self._format_time_for_tooltip(t) for t in x_artifacts[self.folded_indices(x_artifacts, line_indices_down, local_indices_up, starting_sample)] - current_x_shift],
+                    hovertemplate='<b>Artifact</b><br>' +
+                                 'Time: %{customdata}<br>' +
+                                 '<extra></extra>'
                 )
             ])
         figure['data'] = data
@@ -329,7 +365,7 @@ class DashECGSignal(ECG):
             height=self.number_of_lines * self.single_line_height * PHYSICAL_LINE_HEIGHT,
             # yaxis=dict(range=[- 0.5 * self.single_line_height - idx * line_shift, self.single_line_height]),
             showlegend=False,
-            margin=go.Margin(
+            margin=dict(
                 l=50,
                 r=50,
                 b=100,
@@ -384,7 +420,10 @@ class DashECGSignal(ECG):
             y=y_data,
             mode='markers',
             marker=dict(size=12, color='black', opacity=0.2),
-            name='Poincare plot'
+            name='Poincare plot',
+            hovertemplate='<b>RR<sub>i</sub></b>: %{x:.3f} s<br>' +
+                         '<b>RR<sub>i+1</sub></b>: %{y:.3f} s<br>' +
+                         '<extra></extra>'
         )],
             'layout': go.Layout(
                 title="Poincare plot",
