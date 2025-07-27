@@ -25,6 +25,8 @@ class DashECGSignal(ECG):
         self.detection_window = int(0.05 / self.sampling_period)
         self.inverted = False
         self.window_length, self.number_of_lines, self.single_line_height = self.get_initial_window()
+        # Calculate and store initial Poincare plot ranges
+        self._calculate_initial_poincare_ranges()
 
     def get_initial_position(self):
         return self.time_track[0]
@@ -47,6 +49,18 @@ class DashECGSignal(ECG):
             self.number_of_lines = POSSIBLE_LINE_No['5 min']
             self.single_line_height = POSSIBLE_LINE_HEIGHTS['5 min']
         return self.window_length, self.number_of_lines, self.single_line_height
+
+    def _calculate_initial_poincare_ranges(self):
+        """
+        Calculate and store the initial axis ranges for the Poincare plot based on the full dataset.
+        This ensures the plot doesn't jump when data points are filtered out.
+        """
+        x_data = self.RRSignal.poincare.xi
+        y_data = self.RRSignal.poincare.xii
+        min_val = min(min(x_data), min(y_data))
+        max_val = max(max(x_data), max(y_data))
+        self.poincare_range_start = max(0, min_val - (max_val - min_val) * 0.05)  # Start from 0 or slightly below min
+        self.poincare_range_end = max_val + (max_val - min_val) * 0.05  # Add small margin
 
     def get_current_time_track(self):
         position = self.position - self.get_initial_position()
@@ -358,16 +372,41 @@ class DashECGSignal(ECG):
                                 y_supraventriculars, x_artifacts, y_artifacts)
 
     def poincare_plot(self):
-        return {'data': [go.Scatter(
-            x=self.RRSignal.poincare.xi,
-            y=self.RRSignal.poincare.xii,
+        # Use the stored ranges calculated at initialization
+        x_data = self.RRSignal.poincare.xi
+        y_data = self.RRSignal.poincare.xii
+        
+        # Calculate plot size to maintain 1:1 aspect ratio
+        plot_size = 500  # Base size in pixels
+        
+        return {'data': [go.Scattergl(
+            x=x_data,
+            y=y_data,
             mode='markers',
             marker=dict(size=12, color='black', opacity=0.2),
             name='Poincare plot'
         )],
             'layout': go.Layout(
-                title="Poincare plot<br>(<i>toggle off for faster scrolling</i>)",
-                hovermode='closest'
+                title="Poincare plot",
+                hovermode='closest',
+                width=plot_size,
+                height=plot_size,
+                xaxis=dict(
+                    title='RR<sub>i</sub>',
+                    showline=True,
+                    linewidth=1,
+                    linecolor='black',
+                    range=[self.poincare_range_start, self.poincare_range_end],
+                    constraintoward='left'
+                ),
+                yaxis=dict(
+                    title='RR<sub>i+1</sub>',
+                    showline=True,
+                    linewidth=1,
+                    linecolor='black',
+                    range=[self.poincare_range_start, self.poincare_range_end],
+                    constraintoward='bottom'
+                )
             )}
 
     def histogram(self):
