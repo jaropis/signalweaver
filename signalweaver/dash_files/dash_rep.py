@@ -377,7 +377,7 @@ class DashECGSignal(ECG):
             name='Poincare plot'
         )],
             'layout': go.Layout(
-                title="Poincare plot<br>(<i>toggle off for faster scrolling</i>)",
+                title="Poincare plot",
                 hovermode='closest',
                 width=plot_size,
                 height=plot_size,
