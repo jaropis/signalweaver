@@ -329,7 +329,7 @@ class DashECGSignal(ECG):
             height=self.number_of_lines * self.single_line_height * PHYSICAL_LINE_HEIGHT,
             # yaxis=dict(range=[- 0.5 * self.single_line_height - idx * line_shift, self.single_line_height]),
             showlegend=False,
-            margin=go.Margin(
+            margin=dict(
                 l=50,
                 r=50,
                 b=100,
