@@ -8,28 +8,28 @@ def prepare_layout(app):
         html.Div([
             html.Div([
                 # Controls section (including upload)
-                html.Div([
-                    dcc.Upload(
-                        id='upload-data',
-                        children=html.Div([
-                            'Drag and Drop or',
-                            html.A(' Select Files')
-                        ]),
+                # html.Div([
+                #     dcc.Upload(
+                #         id='upload-data',
+                #         children=html.Div([
+                #             'Drag and Drop or',
+                #             html.A(' Select Files')
+                #         ]),
 
-                        style={
-                            'width': '100%',
-                            'height': '60px',
-                            'lineHeight': '60px',
-                            'borderWidth': '1px',
-                            'borderStyle': 'dashed',
-                            'borderRadius': '5px',
-                            'textAlign': 'center',
-                            'margin': '10px'
-                        },
-                        # Allow multiple files to be uploaded
-                        multiple=False
-                    )
-                ]),
+                #         style={
+                #             'width': '100%',
+                #             'height': '60px',
+                #             'lineHeight': '60px',
+                #             'borderWidth': '1px',
+                #             'borderStyle': 'dashed',
+                #             'borderRadius': '5px',
+                #             'textAlign': 'center',
+                #             'margin': '10px'
+                #         },
+                #         # Allow multiple files to be uploaded
+                #         multiple=False
+                #     )
+                # ]),
                 html.Div([
                     html.Div([
                         dcc.Checklist(
