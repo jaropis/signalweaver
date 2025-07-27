@@ -1,5 +1,5 @@
 import unittest
-from scipy import array
+from numpy import array
 from RRclasses import Signal
 
 class TestPoincareFiltering(unittest.TestCase):

@@ -2,7 +2,7 @@
 
 import numpy as np
 import scipy.signal as signal
-from scipy import sum, var
+from numpy import sum, var
 import pylab as plt
 
 def test_lomb_scargle(skala = 2*np.pi, frac_points=0.9, nout=1000, predicted_spectral_content = 2*np.pi):
