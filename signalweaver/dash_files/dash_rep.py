@@ -358,16 +358,45 @@ class DashECGSignal(ECG):
                                 y_supraventriculars, x_artifacts, y_artifacts)
 
     def poincare_plot(self):
+        # Calculate ranges to ensure proper axis positioning
+        x_data = self.RRSignal.poincare.xi
+        y_data = self.RRSignal.poincare.xii
+        min_val = min(min(x_data), min(y_data))
+        max_val = max(max(x_data), max(y_data))
+        range_start = max(0, min_val - (max_val - min_val) * 0.05)  # Start from 0 or slightly below min
+        range_end = max_val + (max_val - min_val) * 0.05  # Add small margin
+        
+        # Calculate plot size to maintain 1:1 aspect ratio
+        plot_size = 500  # Base size in pixels
+        
         return {'data': [go.Scattergl(
-            x=self.RRSignal.poincare.xi,
-            y=self.RRSignal.poincare.xii,
+            x=x_data,
+            y=y_data,
             mode='markers',
             marker=dict(size=12, color='black', opacity=0.2),
             name='Poincare plot'
         )],
             'layout': go.Layout(
                 title="Poincare plot<br>(<i>toggle off for faster scrolling</i>)",
-                hovermode='closest'
+                hovermode='closest',
+                width=plot_size,
+                height=plot_size,
+                xaxis=dict(
+                    title='RR<sub>i</sub>',
+                    showline=True,
+                    linewidth=1,
+                    linecolor='black',
+                    range=[range_start, range_end],
+                    constraintoward='left'
+                ),
+                yaxis=dict(
+                    title='RR<sub>i+1</sub>',
+                    showline=True,
+                    linewidth=1,
+                    linecolor='black',
+                    range=[range_start, range_end],
+                    constraintoward='bottom'
+                )
             )}
 
     def histogram(self):
