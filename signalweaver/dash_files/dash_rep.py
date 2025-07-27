@@ -435,7 +435,7 @@ class DashECGSignal(ECG):
                     showline=True,
                     linewidth=1,
                     linecolor='black',
-                    range=[self.poincare_range_start, self.poincare_range_end],
+                    range=[0, self.poincare_range_end],
                     constraintoward='left'
                 ),
                 yaxis=dict(
@@ -443,7 +443,7 @@ class DashECGSignal(ECG):
                     showline=True,
                     linewidth=1,
                     linecolor='black',
-                    range=[self.poincare_range_start, self.poincare_range_end],
+                    range=[0, self.poincare_range_end],
                     constraintoward='bottom'
                 )
             )}
