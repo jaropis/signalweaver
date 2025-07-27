@@ -358,7 +358,7 @@ class DashECGSignal(ECG):
                                 y_supraventriculars, x_artifacts, y_artifacts)
 
     def poincare_plot(self):
-        return {'data': [go.Scatter(
+        return {'data': [go.Scattergl(
             x=self.RRSignal.poincare.xi,
             y=self.RRSignal.poincare.xii,
             mode='markers',
