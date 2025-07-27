@@ -410,13 +410,21 @@ class DashECGSignal(ECG):
             )}
 
     def histogram(self):
+        rr_data = self.rr_intervals[self.rr_annotations == 0]
+        
         return {'data': [go.Histogram(
-            x=self.rr_intervals,
+            x=rr_data,
             histnorm='probability',
             name='Histogram of RR intervals'
         )],
             'layout': go.Layout(
-                title="Histogram of RR intervals <br>(<i>toggle off for faster scrolling</i>)",
-                hovermode='closest'
+                title="Histogram of RR intervals",
+                hovermode='closest',
+                xaxis=dict(
+                    title='RR interval (s)'
+                ),
+                yaxis=dict(
+                    title='Probability'
+                ),
             )
         }
