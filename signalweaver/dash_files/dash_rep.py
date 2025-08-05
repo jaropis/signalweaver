@@ -412,8 +412,8 @@ class DashECGSignal(ECG):
         x_data = self.RRSignal.poincare.xi
         y_data = self.RRSignal.poincare.xii
         
-        # Calculate plot size to maintain 1:1 aspect ratio
-        plot_size = 500  # Base size in pixels
+        # Calculate plot size to maintain 1:1 aspect ratio - larger size for expanded layout
+        plot_size = 700  # Increased base size in pixels for the larger container
         
         return {'data': [go.Scattergl(
             x=x_data,
@@ -448,22 +448,4 @@ class DashECGSignal(ECG):
                 )
             )}
 
-    def histogram(self):
-        rr_data = self.rr_intervals[self.rr_annotations == 0]
-        
-        return {'data': [go.Histogram(
-            x=rr_data,
-            histnorm='probability',
-            name='Histogram of RR intervals'
-        )],
-            'layout': go.Layout(
-                title="Histogram of RR intervals",
-                hovermode='closest',
-                xaxis=dict(
-                    title='RR interval (s)'
-                ),
-                yaxis=dict(
-                    title='Probability'
-                ),
-            )
-        }
+

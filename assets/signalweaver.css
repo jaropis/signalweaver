@@ -159,8 +159,12 @@ body {
 }
 
 /* Special styling for plot containers */
-.four.columns:has(#poincare-plot),
-.four.columns:has(#RR-histogram) {
+.four.columns:has(#poincare-plot) {
+  background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+  border: 1px solid rgba(52, 152, 219, 0.1);
+}
+
+.eight.columns:has(#poincare-plot) {
   background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
   border: 1px solid rgba(52, 152, 219, 0.1);
 }
@@ -863,8 +867,7 @@ tr:hover td:not(.CalendarDay) {
   border: 1px solid rgba(52, 152, 219, 0.1);
 }
 
-#poincare-plot,
-#RR-histogram {
+#poincare-plot {
   border-radius: 8px;
   overflow: hidden;
 }
@@ -946,8 +949,7 @@ tr:hover td:not(.CalendarDay) {
   );
 }
 
-#poincare-plot,
-#RR-histogram {
+#poincare-plot {
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);

@@ -81,15 +81,10 @@ def prepare_layout(app):
                 ], className="mb-2")
             ], className='four columns'),
             html.Div([
-                # Poincare plot in the middle
+                # Poincare plot taking more space
                 html.H3("📊 Poincaré Plot", className="section-header"),
                 dcc.Graph(id='poincare-plot')
-            ], className='four columns'),
-            html.Div([
-                # RR histogram on the right
-                html.H3("📈 RR Histogram", className="section-header"),
-                dcc.Graph(id='RR-histogram')
-            ], className='four columns')
+            ], className='eight columns')
         ], className='row'),
         # Navigation section
         html.Div([
