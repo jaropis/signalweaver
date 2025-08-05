@@ -6,7 +6,7 @@ def prepare_layout(app):
     app.layout = html.Div(id='main-panel', children=[
         # Header section
         html.Div([
-            html.H1("⚡ Signal Weaver", className="text-center mb-3"),
+            html.H1("⚡ SignalWeaver", className="text-center mb-3"),
             html.P("Advanced ECG Signal Analysis Platform", className="text-center text-light mb-2")
         ], className="row"),
         
