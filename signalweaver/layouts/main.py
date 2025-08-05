@@ -42,8 +42,9 @@ def prepare_layout(app):
                         dcc.Checklist(
                             options=[{'label': 'Invert ECG', 'value': 'Invert'}],
                             value=[],
-                            labelStyle={'display': 'inline-block', 'margin-right': '10px'},
-                            id='invert-ecg-toggle'
+                            labelStyle={'display': 'flex', 'align-items': 'center', 'gap': '8px'},
+                            id='invert-ecg-toggle',
+                            className='checklist-container'
                         )
                     ], className='twelve columns mb-2'),
                     html.Div([
@@ -97,9 +98,9 @@ def prepare_layout(app):
                 html.Div([
                     html.Label("Navigate through the signal", className="mb-1"),
                     html.Div([
-                        html.Button('← Move Left', id='move-left', style={'width': '48%', 'margin-right': '4%'}),
-                        html.Button('Move Right →', id='move-right', style={'width': '48%'})
-                    ])
+                        html.Button('← Move Left', id='move-left'),
+                        html.Button('Move Right →', id='move-right')
+                    ], className='button-container')
                 ])
             ], className='twelve columns')
         ], className='row'),

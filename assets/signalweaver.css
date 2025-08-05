@@ -497,7 +497,9 @@ input[type="button"].button-primary:focus {
 #move-right {
   background: linear-gradient(135deg, var(--warning-color), #e67e22);
   font-size: 1.2rem;
-  margin: 5px 2px;
+  margin: 5px 0;
+  display: inline-block;
+  vertical-align: top;
 }
 
 #save-results {
@@ -619,8 +621,55 @@ input[type="checkbox"] {
   position: relative;
   cursor: pointer;
   transition: all 0.3s ease;
+  vertical-align: middle;
+  display: inline-block;
 }
 
+/* Fix checkbox label alignment */
+.rc-checkbox {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.rc-checkbox-wrapper {
+  display: inline-flex !important;
+  align-items: center !important;
+}
+
+/* Dash checklist styling */
+.checklist-container label {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin: 0 !important;
+}
+
+/* Ensure Dash checklist items are properly aligned */
+#invert-ecg-toggle label {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin: 0 !important;
+  font-size: 1.4rem !important;
+}
+
+#invert-ecg-toggle .rc-checkbox {
+  display: inline-flex !important;
+  align-items: center !important;
+}
+
+/* Button container styling */
+.button-container {
+  display: flex;
+  gap: 2%;
+  width: 100%;
+}
+
+.button-container button {
+  flex: 1;
+  margin: 0 !important;
+}
 input[type="checkbox"]:checked {
   background: var(--secondary-color);
   border-color: var(--secondary-color);
