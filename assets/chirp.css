@@ -16,6 +16,79 @@
 - Media Queries
 */
 
+/* Modern SignalWeaver Styling
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+
+/* Color Palette */
+:root {
+  --primary-color: #2c3e50;
+  --secondary-color: #3498db;
+  --accent-color: #e74c3c;
+  --success-color: #27ae60;
+  --warning-color: #f39c12;
+  --dark-color: #34495e;
+  --light-color: #ecf0f1;
+  --white: #ffffff;
+  --text-dark: #2c3e50;
+  --text-light: #7f8c8d;
+  --border-color: #bdc3c7;
+  --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  --shadow-hover: 0 4px 20px rgba(0, 0, 0, 0.15);
+  --gradient-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --card-gradient: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+}
+
+/* Global Styles */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--gradient-bg);
+  min-height: 100vh;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--text-dark);
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+}
+
+/* Main Panel */
+#main-panel {
+  background: var(--white);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  margin: 20px;
+  padding: 30px;
+  min-height: calc(100vh - 40px);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Header styling */
+#main-panel h1 {
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--secondary-color)
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 3.5rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+#main-panel h1 + p {
+  text-align: center;
+  color: var(--text-light);
+  font-size: 1.6rem;
+  margin-bottom: 30px;
+  font-style: italic;
+}
+
 /* PLotly.js 
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 /* plotly.js's modebar's z-index is 1001 by default
@@ -25,391 +98,1053 @@
  * Increase the select option's z-index
  */
 
-/* This was actually not quite right -
-   dropdowns were overlapping each other (edited October 26)
-
 .Select {
-    z-index: 1002;
-}*/
-
+  z-index: 1002;
+}
 
 /* Grid
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 .container {
-    position: relative;
-    width: 100%;
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 0 20px;
-    box-sizing: border-box; }
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+
+.column,
+.columns {
+  width: 100%;
+  float: left;
+  box-sizing: border-box;
+}
+
+/* Card-like styling for columns */
+.four.columns {
+  background: var(--card-gradient);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: 25px;
+  margin-bottom: 25px;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.four.columns::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    var(--secondary-color),
+    var(--primary-color)
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.four.columns:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-4px);
+}
+
+.four.columns:hover::before {
+  opacity: 1;
+}
+
+/* Special styling for plot containers */
+.four.columns:has(#poincare-plot),
+.four.columns:has(#RR-histogram) {
+  background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+  border: 1px solid rgba(52, 152, 219, 0.1);
+}
+
+.twelve.columns {
+  background: var(--white);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.twelve.columns:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+/* For devices larger than 400px */
+@media (min-width: 400px) {
+  .container {
+    width: 90%;
+    padding: 0;
+  }
+}
+
+/* For devices larger than 550px */
+@media (min-width: 550px) {
+  .container {
+    width: 95%;
+  }
   .column,
   .columns {
+    margin-left: 2%;
+  }
+  .column:first-child,
+  .columns:first-child {
+    margin-left: 0;
+  }
+
+  .one.column,
+  .one.columns {
+    width: 4.66666666667%;
+  }
+  .two.columns {
+    width: 13.3333333333%;
+  }
+  .three.columns {
+    width: 22%;
+  }
+  .four.columns {
+    width: 30.6666666667%;
+  }
+  .five.columns {
+    width: 39.3333333333%;
+  }
+  .six.columns {
+    width: 48%;
+  }
+  .seven.columns {
+    width: 56.6666666667%;
+  }
+  .eight.columns {
+    width: 65.3333333333%;
+  }
+  .nine.columns {
+    width: 74%;
+  }
+  .ten.columns {
+    width: 82.6666666667%;
+  }
+  .eleven.columns {
+    width: 91.3333333333%;
+  }
+  .twelve.columns {
     width: 100%;
-    float: left;
-    box-sizing: border-box; }
-  
-  /* For devices larger than 400px */
-  @media (min-width: 400px) {
-    .container {
-      width: 85%;
-      padding: 0; }
+    margin-left: 0;
   }
-  
-  /* For devices larger than 550px */
-  @media (min-width: 550px) {
-    .container {
-      width: 80%; }
-    .column,
-    .columns {
-      margin-left: 4%; }
-    .column:first-child,
-    .columns:first-child {
-      margin-left: 0; }
-  
-    .one.column,
-    .one.columns                    { width: 4.66666666667%; }
-    .two.columns                    { width: 13.3333333333%; }
-    .three.columns                  { width: 22%;            }
-    .four.columns                   { width: 30.6666666667%; }
-    .five.columns                   { width: 39.3333333333%; }
-    .six.columns                    { width: 48%;            }
-    .seven.columns                  { width: 56.6666666667%; }
-    .eight.columns                  { width: 65.3333333333%; }
-    .nine.columns                   { width: 74.0%;          }
-    .ten.columns                    { width: 82.6666666667%; }
-    .eleven.columns                 { width: 91.3333333333%; }
-    .twelve.columns                 { width: 100%; margin-left: 0; }
-  
-    .one-third.column               { width: 30.6666666667%; }
-    .two-thirds.column              { width: 65.3333333333%; }
-  
-    .one-half.column                { width: 48%; }
-  
-    /* Offsets */
-    .offset-by-one.column,
-    .offset-by-one.columns          { margin-left: 8.66666666667%; }
-    .offset-by-two.column,
-    .offset-by-two.columns          { margin-left: 17.3333333333%; }
-    .offset-by-three.column,
-    .offset-by-three.columns        { margin-left: 26%;            }
-    .offset-by-four.column,
-    .offset-by-four.columns         { margin-left: 34.6666666667%; }
-    .offset-by-five.column,
-    .offset-by-five.columns         { margin-left: 43.3333333333%; }
-    .offset-by-six.column,
-    .offset-by-six.columns          { margin-left: 52%;            }
-    .offset-by-seven.column,
-    .offset-by-seven.columns        { margin-left: 60.6666666667%; }
-    .offset-by-eight.column,
-    .offset-by-eight.columns        { margin-left: 69.3333333333%; }
-    .offset-by-nine.column,
-    .offset-by-nine.columns         { margin-left: 78.0%;          }
-    .offset-by-ten.column,
-    .offset-by-ten.columns          { margin-left: 86.6666666667%; }
-    .offset-by-eleven.column,
-    .offset-by-eleven.columns       { margin-left: 95.3333333333%; }
-  
-    .offset-by-one-third.column,
-    .offset-by-one-third.columns    { margin-left: 34.6666666667%; }
-    .offset-by-two-thirds.column,
-    .offset-by-two-thirds.columns   { margin-left: 69.3333333333%; }
-  
-    .offset-by-one-half.column,
-    .offset-by-one-half.columns     { margin-left: 52%; }
-  
+
+  .one-third.column {
+    width: 30.6666666667%;
   }
-  
-  
-  /* Base Styles
+  .two-thirds.column {
+    width: 65.3333333333%;
+  }
+
+  .one-half.column {
+    width: 48%;
+  }
+
+  /* Offsets */
+  .offset-by-one.column,
+  .offset-by-one.columns {
+    margin-left: 8.66666666667%;
+  }
+  .offset-by-two.column,
+  .offset-by-two.columns {
+    margin-left: 17.3333333333%;
+  }
+  .offset-by-three.column,
+  .offset-by-three.columns {
+    margin-left: 26%;
+  }
+  .offset-by-four.column,
+  .offset-by-four.columns {
+    margin-left: 34.6666666667%;
+  }
+  .offset-by-five.column,
+  .offset-by-five.columns {
+    margin-left: 43.3333333333%;
+  }
+  .offset-by-six.column,
+  .offset-by-six.columns {
+    margin-left: 52%;
+  }
+  .offset-by-seven.column,
+  .offset-by-seven.columns {
+    margin-left: 60.6666666667%;
+  }
+  .offset-by-eight.column,
+  .offset-by-eight.columns {
+    margin-left: 69.3333333333%;
+  }
+  .offset-by-nine.column,
+  .offset-by-nine.columns {
+    margin-left: 78%;
+  }
+  .offset-by-ten.column,
+  .offset-by-ten.columns {
+    margin-left: 86.6666666667%;
+  }
+  .offset-by-eleven.column,
+  .offset-by-eleven.columns {
+    margin-left: 95.3333333333%;
+  }
+
+  .offset-by-one-third.column,
+  .offset-by-one-third.columns {
+    margin-left: 34.6666666667%;
+  }
+  .offset-by-two-thirds.column,
+  .offset-by-two-thirds.columns {
+    margin-left: 69.3333333333%;
+  }
+
+  .offset-by-one-half.column,
+  .offset-by-one-half.columns {
+    margin-left: 52%;
+  }
+}
+
+/* Base Styles
   –––––––––––––––––––––––––––––––––––––––––––––––––– */
-  /* NOTE
-  html is set to 62.5% so that all the REM measurements throughout Skeleton
-  are based on 10px sizing. So basically 1.5rem = 15px :) */
-  html {
-    font-size: 62.5%; }
+html {
+  font-size: 62.5%;
+}
+body {
+  font-size: 1.6em;
+  line-height: 1.6;
+  font-weight: 400;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--text-dark);
+  margin: 0;
+  padding: 0;
+}
+
+/* Typography
+  –––––––––––––––––––––––––––––––––––––––––––––––––– */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin-top: 0;
+  margin-bottom: 0;
+  font-weight: 600;
+  color: var(--primary-color);
+}
+h1 {
+  font-size: 3.2rem;
+  line-height: 1.2;
+  letter-spacing: -0.05rem;
+  margin-bottom: 2rem;
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--secondary-color)
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+h2 {
+  font-size: 2.8rem;
+  line-height: 1.25;
+  letter-spacing: -0.05rem;
+  margin-bottom: 1.8rem;
+  margin-top: 1.8rem;
+}
+h3 {
+  font-size: 2.4rem;
+  line-height: 1.3;
+  letter-spacing: -0.03rem;
+  margin-bottom: 1.5rem;
+  margin-top: 1.5rem;
+}
+h4 {
+  font-size: 2rem;
+  line-height: 1.35;
+  letter-spacing: -0.02rem;
+  margin-bottom: 1.2rem;
+  margin-top: 1.2rem;
+}
+h5 {
+  font-size: 1.8rem;
+  line-height: 1.5;
+  letter-spacing: -0.01rem;
+  margin-bottom: 0.6rem;
+  margin-top: 0.6rem;
+}
+h6 {
+  font-size: 1.6rem;
+  line-height: 1.6;
+  letter-spacing: 0;
+  margin-bottom: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+p {
+  margin-top: 0;
+  color: var(--text-dark);
+}
+
+/* Blockquotes
+  –––––––––––––––––––––––––––––––––––––––––––––––––– */
+blockquote {
+  border-left: 4px var(--secondary-color) solid;
+  padding-left: 1.5rem;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  margin-left: 0rem;
+  background: var(--light-color);
+  border-radius: 0 8px 8px 0;
+  padding: 1.5rem;
+}
+
+/* Links
+  –––––––––––––––––––––––––––––––––––––––––––––––––– */
+a {
+  color: var(--secondary-color);
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+a:hover {
+  color: var(--primary-color);
+  text-decoration: underline;
+}
+
+/* Buttons
+  –––––––––––––––––––––––––––––––––––––––––––––––––– */
+.button,
+button,
+input[type="submit"],
+input[type="reset"],
+input[type="button"] {
+  display: inline-block;
+  height: 44px;
+  padding: 0 25px;
+  color: var(--white);
+  text-align: center;
+  font-size: 1.3rem;
+  font-weight: 600;
+  line-height: 44px;
+  letter-spacing: 0.05rem;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  background: linear-gradient(
+    135deg,
+    var(--secondary-color),
+    var(--primary-color)
+  );
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+  margin: 5px;
+}
+
+.button:hover,
+button:hover,
+input[type="submit"]:hover,
+input[type="reset"]:hover,
+input[type="button"]:hover,
+.button:focus,
+button:focus,
+input[type="submit"]:focus,
+input[type="reset"]:focus,
+input[type="button"]:focus {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+  outline: 0;
+}
+
+.button.button-primary,
+button.button-primary,
+input[type="submit"].button-primary,
+input[type="reset"].button-primary,
+input[type="button"].button-primary {
+  background: linear-gradient(135deg, var(--success-color), #2ecc71);
+  box-shadow: 0 2px 8px rgba(39, 174, 96, 0.3);
+}
+
+.button.button-primary:hover,
+button.button-primary:hover,
+input[type="submit"].button-primary:hover,
+input[type="reset"].button-primary:hover,
+input[type="button"].button-primary:hover,
+.button.button-primary:focus,
+button.button-primary:focus,
+input[type="submit"].button-primary:focus,
+input[type="reset"].button-primary:focus,
+input[type="button"].button-primary:focus {
+  box-shadow: 0 4px 15px rgba(39, 174, 96, 0.4);
+}
+
+/* Navigation buttons special styling */
+#move-left,
+#move-right {
+  background: linear-gradient(135deg, var(--warning-color), #e67e22);
+  font-size: 1.2rem;
+  margin: 5px 2px;
+}
+
+#save-results {
+  background: linear-gradient(135deg, var(--success-color), #2ecc71);
+  font-size: 1.4rem;
+  padding: 0 30px;
+}
+
+/* Forms
+  –––––––––––––––––––––––––––––––––––––––––––––––––– */
+input[type="email"],
+input[type="number"],
+input[type="search"],
+input[type="text"],
+input[type="tel"],
+input[type="url"],
+input[type="password"],
+textarea,
+select {
+  height: 44px;
+  padding: 10px 15px;
+  background-color: var(--white);
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: 1.4rem;
+  transition: all 0.3s ease;
+}
+
+/* Dash dropdown styling */
+.Select-control {
+  height: 44px !important;
+  border: 2px solid var(--border-color) !important;
+  border-radius: 8px !important;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+  transition: all 0.3s ease !important;
+}
+
+.Select-control:hover {
+  border-color: var(--secondary-color) !important;
+}
+
+.is-focused .Select-control {
+  border-color: var(--secondary-color) !important;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1) !important;
+}
+
+.Select-menu-outer {
+  border-radius: 8px !important;
+  box-shadow: var(--shadow) !important;
+  border: 2px solid var(--border-color) !important;
+}
+
+.Select-option:hover {
+  background-color: var(--secondary-color) !important;
+  color: var(--white) !important;
+}
+
+/* Removes awkward default styles on some inputs for iOS */
+input[type="email"],
+input[type="number"],
+input[type="search"],
+input[type="text"],
+input[type="tel"],
+input[type="url"],
+input[type="password"],
+textarea {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+textarea {
+  min-height: 80px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  resize: vertical;
+}
+
+input[type="email"]:focus,
+input[type="number"]:focus,
+input[type="search"]:focus,
+input[type="text"]:focus,
+input[type="tel"]:focus,
+input[type="url"]:focus,
+input[type="password"]:focus,
+textarea:focus,
+select:focus {
+  border: 2px solid var(--secondary-color);
+  outline: 0;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+label,
+legend {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: var(--primary-color);
+  font-size: 1.4rem;
+}
+
+fieldset {
+  padding: 0;
+  border-width: 0;
+}
+
+/* Custom checkbox styling */
+input[type="checkbox"] {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border-color);
+  border-radius: 4px;
+  background: var(--white);
+  margin-right: 10px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+input[type="checkbox"]:checked {
+  background: var(--secondary-color);
+  border-color: var(--secondary-color);
+}
+
+input[type="checkbox"]:checked::after {
+  content: "✓";
+  position: absolute;
+  top: -2px;
+  left: 2px;
+  color: var(--white);
+  font-size: 14px;
+  font-weight: bold;
+}
+
+input[type="radio"] {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border-color);
+  border-radius: 50%;
+  background: var(--white);
+  margin-right: 10px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+input[type="radio"]:checked {
+  border-color: var(--secondary-color);
+}
+
+input[type="radio"]:checked::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--secondary-color);
+}
+
+label > .label-body {
+  display: inline-block;
+  margin-left: 0.5rem;
+  font-weight: normal;
+  color: var(--text-dark);
+}
+
+/* Lists
+  –––––––––––––––––––––––––––––––––––––––––––––––––– */
+ul {
+  list-style: circle inside;
+}
+ol {
+  list-style: decimal inside;
+}
+ol,
+ul {
+  padding-left: 0;
+  margin-top: 0;
+}
+ul ul,
+ul ol,
+ol ol,
+ol ul {
+  margin: 1.5rem 0 1.5rem 3rem;
+  font-size: 90%;
+}
+li {
+  margin-bottom: 1rem;
+}
+
+/* Tables
+  –––––––––––––––––––––––––––––––––––––––––––––––––– */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  background: var(--white);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+th:not(.CalendarDay),
+td:not(.CalendarDay) {
+  padding: 15px 20px;
+  text-align: left;
+  border-bottom: 1px solid var(--light-color);
+}
+th:not(.CalendarDay) {
+  background: var(--primary-color);
+  color: var(--white);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05rem;
+}
+th:first-child:not(.CalendarDay),
+td:first-child:not(.CalendarDay) {
+  padding-left: 20px;
+}
+th:last-child:not(.CalendarDay),
+td:last-child:not(.CalendarDay) {
+  padding-right: 20px;
+}
+tr:hover td:not(.CalendarDay) {
+  background: var(--light-color);
+}
+
+/* Plot Containers
+  –––––––––––––––––––––––––––––––––––––––––––––––––– */
+#ECG {
+  background: var(--white);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  padding: 20px;
+  margin: 20px 0;
+  border: 1px solid rgba(52, 152, 219, 0.1);
+}
+
+#poincare-plot,
+#RR-histogram {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Download link styling */
+#download-link {
+  display: inline-block;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, var(--success-color), #2ecc71);
+  color: var(--white) !important;
+  border-radius: 8px;
+  text-decoration: none !important;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(39, 174, 96, 0.3);
+}
+
+#download-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(39, 174, 96, 0.4);
+}
+
+/* Section headers */
+.section-header {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 3px solid transparent;
+  border-image: linear-gradient(
+      90deg,
+      var(--secondary-color),
+      var(--primary-color)
+    )
+    1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.section-header::before {
+  content: "";
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    var(--secondary-color),
+    var(--primary-color)
+  );
+  margin-right: 12px;
+  border-radius: 2px;
+}
+
+/* Enhanced plot containers */
+#ECG {
+  background: var(--white);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: 25px;
+  margin: 25px 0;
+  border: 1px solid rgba(52, 152, 219, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+#ECG::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    var(--secondary-color),
+    var(--success-color),
+    var(--warning-color)
+  );
+}
+
+#poincare-plot,
+#RR-histogram {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Enhanced download link */
+#download-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, var(--success-color), #2ecc71);
+  color: var(--white) !important;
+  border-radius: 10px;
+  text-decoration: none !important;
+  font-weight: 600;
+  font-size: 1.4rem;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+  border: none;
+  min-height: 48px;
+}
+
+#download-link::before {
+  content: "⬇";
+  margin-right: 8px;
+  font-size: 1.6rem;
+}
+
+#download-link:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+  background: linear-gradient(135deg, #2ecc71, var(--success-color));
+}
+
+/* Spacing
+  –––––––––––––––––––––––––––––––––––––––––––––––––– */
+button,
+.button {
+  margin-bottom: 10px;
+}
+input,
+textarea,
+select,
+fieldset {
+  margin-bottom: 15px;
+}
+pre,
+dl,
+figure,
+table,
+form {
+  margin-bottom: 20px;
+}
+p,
+ul,
+ol {
+  margin-bottom: 15px;
+}
+
+/* Utilities
+  –––––––––––––––––––––––––––––––––––––––––––––––––– */
+.u-full-width {
+  width: 100%;
+  box-sizing: border-box;
+}
+.u-max-full-width {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+.u-pull-right {
+  float: right;
+}
+.u-pull-left {
+  float: left;
+}
+
+/* Modern utility classes */
+.text-center {
+  text-align: center;
+}
+.text-left {
+  text-align: left;
+}
+.text-right {
+  text-align: right;
+}
+
+.mt-0 {
+  margin-top: 0;
+}
+.mt-1 {
+  margin-top: 10px;
+}
+.mt-2 {
+  margin-top: 20px;
+}
+.mt-3 {
+  margin-top: 30px;
+}
+
+.mb-0 {
+  margin-bottom: 0;
+}
+.mb-1 {
+  margin-bottom: 10px;
+}
+.mb-2 {
+  margin-bottom: 20px;
+}
+.mb-3 {
+  margin-bottom: 30px;
+}
+
+.p-1 {
+  padding: 10px;
+}
+.p-2 {
+  padding: 20px;
+}
+.p-3 {
+  padding: 30px;
+}
+
+/* Status indicators */
+.status-indicator {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05rem;
+}
+
+.status-success {
+  background: rgba(39, 174, 96, 0.1);
+  color: var(--success-color);
+  border: 1px solid var(--success-color);
+}
+
+.status-warning {
+  background: rgba(243, 156, 18, 0.1);
+  color: var(--warning-color);
+  border: 1px solid var(--warning-color);
+}
+
+.status-error {
+  background: rgba(231, 76, 60, 0.1);
+  color: var(--accent-color);
+  border: 1px solid var(--accent-color);
+}
+
+/* Misc
+  –––––––––––––––––––––––––––––––––––––––––––––––––– */
+hr {
+  margin-top: 3rem;
+  margin-bottom: 3.5rem;
+  border-width: 0;
+  border-top: 2px solid var(--light-color);
+  border-radius: 2px;
+}
+
+/* Loading states */
+.loading {
+  position: relative;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.loading::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2px solid var(--light-color);
+  border-top: 2px solid var(--secondary-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.6s ease-out;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary-color: #3498db;
+    --secondary-color: #5dade2;
+    --text-dark: #ecf0f1;
+    --text-light: #bdc3c7;
+    --white: #2c3e50;
+    --light-color: #34495e;
+  }
+
   body {
-    font-size: 1.5em; /* currently ems cause chrome bug misinterpreting rems on body element */
-    line-height: 1.6;
-    font-weight: 400;
-    font-family: "Open Sans", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
-    color: rgb(50, 50, 50); }
-  
-  
-  /* Typography
-  –––––––––––––––––––––––––––––––––––––––––––––––––– */
-  h1, h2, h3, h4, h5, h6 {
-    margin-top: 0;
-    margin-bottom: 0;
-    font-weight: 300; }
-  h1 { font-size: 4.5rem; line-height: 1.2;  letter-spacing: -.1rem; margin-bottom: 2rem; }
-  h2 { font-size: 3.6rem; line-height: 1.25; letter-spacing: -.1rem; margin-bottom: 1.8rem; margin-top: 1.8rem;}
-  h3 { font-size: 3.0rem; line-height: 1.3;  letter-spacing: -.1rem; margin-bottom: 1.5rem; margin-top: 1.5rem;}
-  h4 { font-size: 2.6rem; line-height: 1.35; letter-spacing: -.08rem; margin-bottom: 1.2rem; margin-top: 1.2rem;}
-  h5 { font-size: 2.2rem; line-height: 1.5;  letter-spacing: -.05rem; margin-bottom: 0.6rem; margin-top: 0.6rem;}
-  h6 { font-size: 2.0rem; line-height: 1.6;  letter-spacing: 0; margin-bottom: 0.75rem; margin-top: 0.75rem;}
-  
-  p {
-    margin-top: 0; }
-  
-  
-  /* Blockquotes
-  –––––––––––––––––––––––––––––––––––––––––––––––––– */
-  blockquote {
-    border-left: 4px lightgrey solid;
-    padding-left: 1rem;
-    margin-top: 2rem;
-    margin-bottom: 2rem;
-    margin-left: 0rem;
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
   }
-  
-  
-  /* Links
-  –––––––––––––––––––––––––––––––––––––––––––––––––– */
-  a {
-    color: #1EAEDB; 
-    text-decoration: underline;
-    cursor: pointer;}
-  a:hover {
-    color: #0FA0CE; }
-  
-  
-  /* Buttons
-  –––––––––––––––––––––––––––––––––––––––––––––––––– */
-  .button,
-  button,
-  input[type="submit"],
-  input[type="reset"],
-  input[type="button"] {
-    display: inline-block;
-    height: 38px;
-    padding: 0 30px;
-    color: #555;
-    text-align: center;
-    font-size: 11px;
-    font-weight: 600;
-    line-height: 38px;
-    letter-spacing: .1rem;
-    text-transform: uppercase;
-    text-decoration: none;
-    white-space: nowrap;
-    background-color: transparent;
-    border-radius: 4px;
-    border: 1px solid #bbb;
-    cursor: pointer;
-    box-sizing: border-box; }
-  .button:hover,
-  button:hover,
-  input[type="submit"]:hover,
-  input[type="reset"]:hover,
-  input[type="button"]:hover,
-  .button:focus,
-  button:focus,
-  input[type="submit"]:focus,
-  input[type="reset"]:focus,
-  input[type="button"]:focus {
-    color: #333;
-    border-color: #888;
-    outline: 0; }
-  .button.button-primary,
-  button.button-primary,
-  input[type="submit"].button-primary,
-  input[type="reset"].button-primary,
-  input[type="button"].button-primary {
-    color: #FFF;
-    background-color: #33C3F0;
-    border-color: #33C3F0; }
-  .button.button-primary:hover,
-  button.button-primary:hover,
-  input[type="submit"].button-primary:hover,
-  input[type="reset"].button-primary:hover,
-  input[type="button"].button-primary:hover,
-  .button.button-primary:focus,
-  button.button-primary:focus,
-  input[type="submit"].button-primary:focus,
-  input[type="reset"].button-primary:focus,
-  input[type="button"].button-primary:focus {
-    color: #FFF;
-    background-color: #1EAEDB;
-    border-color: #1EAEDB; }
-  
-  
-  /* Forms
-  –––––––––––––––––––––––––––––––––––––––––––––––––– */
-  input[type="email"],
-  input[type="number"],
-  input[type="search"],
-  input[type="text"],
-  input[type="tel"],
-  input[type="url"],
-  input[type="password"],
-  textarea,
-  select {
-    height: 38px;
-    padding: 6px 10px; /* The 6px vertically centers text on FF, ignored by Webkit */
-    background-color: #fff;
-    border: 1px solid #D1D1D1;
-    border-radius: 4px;
-    box-shadow: none;
-    box-sizing: border-box; 
-    font-family: inherit;
-    font-size: inherit; /*https://stackoverflow.com/questions/6080413/why-doesnt-input-inherit-the-font-from-body*/}
-  /* Removes awkward default styles on some inputs for iOS */
-  input[type="email"],
-  input[type="number"],
-  input[type="search"],
-  input[type="text"],
-  input[type="tel"],
-  input[type="url"],
-  input[type="password"],
-  textarea {
-    -webkit-appearance: none;
-       -moz-appearance: none;
-            appearance: none; }
-  textarea {
-    min-height: 65px;
-    padding-top: 6px;
-    padding-bottom: 6px; }
-  input[type="email"]:focus,
-  input[type="number"]:focus,
-  input[type="search"]:focus,
-  input[type="text"]:focus,
-  input[type="tel"]:focus,
-  input[type="url"]:focus,
-  input[type="password"]:focus,
-  textarea:focus,
-  select:focus {
-    border: 1px solid #33C3F0;
-    outline: 0; }
-  label,
-  legend {
-    display: block;
-    margin-bottom: 0px; }
-  fieldset {
-    padding: 0;
-    border-width: 0; }
-  input[type="checkbox"],
-  input[type="radio"] {
-    display: inline; }
-  label > .label-body {
-    display: inline-block;
-    margin-left: .5rem;
-    font-weight: normal; }
-  
-  
-  /* Lists
-  –––––––––––––––––––––––––––––––––––––––––––––––––– */
-  ul {
-    list-style: circle inside; }
-  ol {
-    list-style: decimal inside; }
-  ol, ul {
-    padding-left: 0;
-    margin-top: 0; }
-  ul ul,
-  ul ol,
-  ol ol,
-  ol ul {
-    margin: 1.5rem 0 1.5rem 3rem;
-    font-size: 90%; }
-  li {
-    margin-bottom: 1rem; }
-  
-  
-  /* Tables
-  –––––––––––––––––––––––––––––––––––––––––––––––––– */
-  table {
-    border-collapse: collapse;
+
+  #main-panel {
+    background: #34495e;
+    color: #ecf0f1;
   }
-  th:not(.CalendarDay),
-  td:not(.CalendarDay) {
-    padding: 12px 15px;
-    text-align: left;
-    border-bottom: 1px solid #E1E1E1; }
-  th:first-child:not(.CalendarDay),
-  td:first-child:not(.CalendarDay) {
-    padding-left: 0; }
-  th:last-child:not(.CalendarDay),
-  td:last-child:not(.CalendarDay) {
-    padding-right: 0; }
-  
-  
-  /* Spacing
+}
+
+/* Clearing
   –––––––––––––––––––––––––––––––––––––––––––––––––– */
+
+/* Self Clearing Goodness */
+.container:after,
+.row:after,
+.u-cf {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* Media Queries
+  –––––––––––––––––––––––––––––––––––––––––––––––––– */
+
+/* Mobile first approach */
+@media (max-width: 549px) {
+  #main-panel {
+    margin: 10px;
+    padding: 20px;
+    border-radius: 15px;
+  }
+
+  .four.columns {
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-bottom: 20px;
+  }
+
+  .six.columns {
+    width: 100% !important;
+    margin-left: 0 !important;
+  }
+
+  h1 {
+    font-size: 2.8rem !important;
+  }
+
+  .section-header {
+    font-size: 1.6rem !important;
+  }
+
   button,
   .button {
-    margin-bottom: 0rem; }
-  input,
-  textarea,
-  select,
-  fieldset {
-    margin-bottom: 0rem; }
-  pre,
-  dl,
-  figure,
-  table,
-  form {
-    margin-bottom: 0rem; }
-  p,
-  ul,
-  ol {
-    margin-bottom: 0.75rem; }
-  
-  /* Utilities
-  –––––––––––––––––––––––––––––––––––––––––––––––––– */
-  .u-full-width {
-    width: 100%;
-    box-sizing: border-box; }
-  .u-max-full-width {
-    max-width: 100%;
-    box-sizing: border-box; }
-  .u-pull-right {
-    float: right; }
-  .u-pull-left {
-    float: left; }
-  
-  
-  /* Misc
-  –––––––––––––––––––––––––––––––––––––––––––––––––– */
-  hr {
-    margin-top: 3rem;
-    margin-bottom: 3.5rem;
-    border-width: 0;
-    border-top: 1px solid #E1E1E1; }
-  
-  
-  /* Clearing
-  –––––––––––––––––––––––––––––––––––––––––––––––––– */
-  
-  /* Self Clearing Goodness */
-  .container:after,
-  .row:after,
-  .u-cf {
-    content: "";
-    display: table;
-    clear: both; }
-  
-  
-  /* Media Queries
-  –––––––––––––––––––––––––––––––––––––––––––––––––– */
-  /*
-  Note: The best way to structure the use of media queries is to create the queries
-  near the relevant code. For example, if you wanted to change the styles for buttons
-  on small devices, paste the mobile query code up in the buttons section and style it
-  there.
-  */
-  
-  
-  /* Larger than mobile */
-  @media (min-width: 400px) {}
-  
-  /* Larger than phablet (also point when grid becomes active) */
-  @media (min-width: 550px) {}
-  
-  /* Larger than tablet */
-  @media (min-width: 750px) {}
-  
-  /* Larger than desktop */
-  @media (min-width: 1000px) {}
-  
-  /* Larger than Desktop HD */
-  @media (min-width: 1200px) {}
+    width: 100% !important;
+    margin-bottom: 10px !important;
+  }
+}
+
+/* Larger than mobile */
+@media (min-width: 400px) {
+  #main-panel {
+    margin: 15px;
+  }
+}
+
+/* Larger than phablet (also point when grid becomes active) */
+@media (min-width: 550px) {
+  .four.columns:hover {
+    transform: translateY(-6px);
+  }
+}
+
+/* Larger than tablet */
+@media (min-width: 750px) {
+  #main-panel {
+    margin: 20px;
+    padding: 35px;
+  }
+
+  .container {
+    width: 95%;
+  }
+}
+
+/* Larger than desktop */
+@media (min-width: 1000px) {
+  .container {
+    max-width: 1400px;
+  }
+
+  #main-panel {
+    padding: 40px;
+  }
+}
+
+/* Larger than Desktop HD */
+@media (min-width: 1200px) {
+  .container {
+    max-width: 1600px;
+  }
+}

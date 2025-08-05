@@ -4,10 +4,17 @@ import settings
 settings.init()
 def prepare_layout(app):
     app.layout = html.Div(id='main-panel', children=[
+        # Header section
+        html.Div([
+            html.H1("⚡ Signal Weaver", className="text-center mb-3"),
+            html.P("Advanced ECG Signal Analysis Platform", className="text-center text-light mb-2")
+        ], className="row"),
+        
         # New layout: Controls (including upload), Poincare plot, and Histogram each taking 1/3 width
         html.Div([
             html.Div([
                 # Controls section (including upload)
+                html.H3("⚙️ Controls", className="section-header"),
                 # html.Div([
                 #     dcc.Upload(
                 #         id='upload-data',
@@ -35,10 +42,10 @@ def prepare_layout(app):
                         dcc.Checklist(
                             options=[{'label': 'Invert ECG', 'value': 'Invert'}],
                             value=[],
-                            labelStyle={'display': 'inline-block'},
+                            labelStyle={'display': 'inline-block', 'margin-right': '10px'},
                             id='invert-ecg-toggle'
                         )
-                    ], className='twelve columns'),
+                    ], className='twelve columns mb-2'),
                     html.Div([
                         html.A(
                             'Download RRs and classifications',
@@ -47,7 +54,7 @@ def prepare_layout(app):
                             href="",
                             target="_blank"
                         )
-                    ], className='twelve columns'),
+                    ], className='twelve columns mb-2'),
                 ], className='row'),
                 html.Div([
                     html.Label('Select viewing length'),
@@ -62,7 +69,7 @@ def prepare_layout(app):
                         ],
                         value='None'
                     )
-                ]),
+                ], className="mb-2"),
                 html.Div([
                     html.Label('Select file'),
                     dcc.Dropdown(
@@ -70,53 +77,57 @@ def prepare_layout(app):
                         options=settings.file_options_list,
                         value=settings.file_options_list[0]['value']
                     )
-                ])
+                ], className="mb-2")
             ], className='four columns'),
             html.Div([
                 # Poincare plot in the middle
+                html.H3("📊 Poincaré Plot", className="section-header"),
                 dcc.Graph(id='poincare-plot')
             ], className='four columns'),
             html.Div([
                 # RR histogram on the right
+                html.H3("📈 RR Histogram", className="section-header"),
                 dcc.Graph(id='RR-histogram')
             ], className='four columns')
         ], className='row'),
+        # Navigation section
         html.Div([
             html.Div([
+                html.H3("🧭 Navigation", className="section-header"),
                 html.Div([
-                    html.Label("Navigation - move left and right"),
-                    html.Button('<< Move left', id='move-left', style={'display': 'inline', 'width': '50%'}),
-                    html.Button('Move right >>', id='move-right', style={'display': 'inline', 'width': '50%'})
-                ], style={'margin-top': '10'})
+                    html.Label("Navigate through the signal", className="mb-1"),
+                    html.Div([
+                        html.Button('← Move Left', id='move-left', style={'width': '48%', 'margin-right': '4%'}),
+                        html.Button('Move Right →', id='move-right', style={'width': '48%'})
+                    ])
+                ])
             ], className='twelve columns')
         ], className='row'),
 
+        # ECG Plot section
         html.Div([
-            #    html.Div([
+            html.H3("💓 ECG Signal", className="section-header"),
             dcc.Graph(id='ECG', config={'displayModeBar': False})
-        ], style={'margin-top': '0'}),
+        ], className='row'),
 
+        # Actions section
         html.Div([
-            html.Button('Save results', id='save-results', style={'display': 'inline', 'width': '50%'})
-        ]),
+            html.Div([
+                html.H3("🎯 Actions", className="section-header"),
+                html.Button('💾 Save Results', id='save-results', className="button-primary")
+            ], className='six columns'),
+            html.Div([
+                html.H3("📋 Status", className="section-header"),
+                html.P(id='saved-results-output', className="status-indicator")
+            ], className='six columns')
+        ], className='row'),
+        # Hidden elements for debugging/state
         html.Div([
-            html.P(id='saved-results-output')
-        ]),
-        html.Div([
-            html.P(id="signal_RR_classification_change", children="")
-        ]),
-
-        html.Div([
-            html.P(id="n_right_clicks", children="")
-        ]),
-        html.Div([
-            html.P(id="n_left_clicks", children="")
-        ]),
-        html.Div([
-            html.P(id="current_file", children="")
-        ]),
-        html.Div([
-            html.P(id="invert-ecg", children="")
+            html.P(id="signal_RR_classification_change", children="", style={'display': 'none'}),
+            html.P(id="n_right_clicks", children="", style={'display': 'none'}),
+            html.P(id="n_left_clicks", children="", style={'display': 'none'}),
+            html.P(id="current_file", children="", style={'display': 'none'}),
+            html.P(id="invert-ecg", children="", style={'display': 'none'})
         ])
     ])
 
