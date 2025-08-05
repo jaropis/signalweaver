@@ -68,7 +68,7 @@ def prepare_layout(app):
                             {'label': '5 min', 'value': '5 min'},
                             {'label': '10 min', 'value': '10 min'}
                         ],
-                        value='None'
+                        value='10 min'
                     )
                 ], className="mb-2"),
                 html.Div([
