@@ -531,109 +531,109 @@ select {
   transition: all 0.3s ease;
 }
 
-  /* Dash dropdown styling */
-  .Select-control {
-    height: 44px !important;
-    border: 2px solid var(--border-color) !important;
-    border-radius: 8px !important;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1) !important;
-    transition: all 0.3s ease !important;
-    position: relative !important;
-    z-index: 1 !important;
-  }
-  
-  .Select-control:hover {
-    border-color: var(--secondary-color) !important;
-  }
-  
-  .is-focused .Select-control {
-    border-color: var(--secondary-color) !important;
-    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1) !important;
-    z-index: 1003 !important;
-  }
-  
-  .Select-menu-outer {
-    border-radius: 8px !important;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
-    border: 2px solid var(--border-color) !important;
-    z-index: 1004 !important;
-    position: absolute !important;
-    width: 100% !important;
-    max-height: 200px !important;
-    overflow-y: auto !important;
-  }
-  
-  /* Specific z-index for different dropdowns to prevent overlap */
-  /* Target the specific dropdown states more precisely */
-  #window-selection .Select-menu-outer {
-    z-index: 1010 !important;
-    position: absolute !important;
-  }
-  
-  #file_selection .Select-menu-outer {
-    z-index: 1005 !important;
-    position: absolute !important;
-  }
-  
-  /* When window selection is focused/open, give it highest priority */
-  #window-selection.is-focused .Select-menu-outer,
-  #window-selection .is-focused .Select-menu-outer {
-    z-index: 1015 !important;
-  }
-  
-  /* Ensure the entire dropdown wrapper gets proper z-index when open */
-  #window-selection .Select--is-open {
-    z-index: 1012 !important;
-  }
-  
-  #file_selection .Select--is-open {
-    z-index: 1006 !important;
-  }
-  
-  /* Container level positioning */
-  #window-selection {
-    position: relative;
-    z-index: 10;
-  }
-  
-  #file_selection {
-    position: relative;
-    z-index: 5;
-  }
-  
-  .Select-option:hover {
-    background-color: var(--secondary-color) !important;
-    color: var(--white) !important;
-  }
-  
-  /* Ensure dropdown containers don't clip content */
-  .Select {
-    z-index: 1002;
-    position: relative;
-  }
-  
-  .is-open .Select {
-    z-index: 1003 !important;
-  }
-  
-  /* Additional Dash-specific class targeting */
-  .Select--is-open {
-    z-index: 1008 !important;
-  }
-  
-  /* Ensure menu appears above other elements */
-  .Select-menu {
-    z-index: 1009 !important;
-  }
-  
-  /* Target Dash's specific dropdown wrapper classes */
-  div[id="window-selection"] > div {
-    z-index: 1011 !important;
-  }
-  
-  div[id="file_selection"] > div {
-    z-index: 1006 !important;
-  }/* Removes awkward default styles on some inputs for iOS */
+/* Dash dropdown styling */
+.Select-control {
+  height: 44px !important;
+  border: 2px solid var(--border-color) !important;
+  border-radius: 8px !important;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+  transition: all 0.3s ease !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.Select-control:hover {
+  border-color: var(--secondary-color) !important;
+}
+
+.is-focused .Select-control {
+  border-color: var(--secondary-color) !important;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1) !important;
+  z-index: 1003 !important;
+}
+
+.Select-menu-outer {
+  border-radius: 8px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+  border: 2px solid var(--border-color) !important;
+  z-index: 1004 !important;
+  position: absolute !important;
+  width: 100% !important;
+  max-height: 200px !important;
+  overflow-y: auto !important;
+}
+
+/* Specific z-index for different dropdowns to prevent overlap */
+/* Target the specific dropdown states more precisely */
+#window-selection .Select-menu-outer {
+  z-index: 1010 !important;
+  position: absolute !important;
+}
+
+#file_selection .Select-menu-outer {
+  z-index: 1005 !important;
+  position: absolute !important;
+}
+
+/* When window selection is focused/open, give it highest priority */
+#window-selection.is-focused .Select-menu-outer,
+#window-selection .is-focused .Select-menu-outer {
+  z-index: 1015 !important;
+}
+
+/* Ensure the entire dropdown wrapper gets proper z-index when open */
+#window-selection .Select--is-open {
+  z-index: 1012 !important;
+}
+
+#file_selection .Select--is-open {
+  z-index: 1006 !important;
+}
+
+/* Container level positioning */
+#window-selection {
+  position: relative;
+  z-index: 10;
+}
+
+#file_selection {
+  position: relative;
+  z-index: 5;
+}
+
+.Select-option:hover {
+  background-color: var(--secondary-color) !important;
+  color: var(--white) !important;
+}
+
+/* Ensure dropdown containers don't clip content */
+.Select {
+  z-index: 1002;
+  position: relative;
+}
+
+.is-open .Select {
+  z-index: 1003 !important;
+}
+
+/* Additional Dash-specific class targeting */
+.Select--is-open {
+  z-index: 1008 !important;
+}
+
+/* Ensure menu appears above other elements */
+.Select-menu {
+  z-index: 1009 !important;
+}
+
+/* Target Dash's specific dropdown wrapper classes */
+div[id="window-selection"] > div {
+  z-index: 1011 !important;
+}
+
+div[id="file_selection"] > div {
+  z-index: 1006 !important;
+} /* Removes awkward default styles on some inputs for iOS */
 input[type="email"],
 input[type="number"],
 input[type="search"],
@@ -1036,53 +1036,67 @@ ol {
   text-align: right;
 }
 
-  .mt-0 { margin-top: 0; }
-  .mt-1 { margin-top: 10px; }
-  .mt-2 { margin-top: 20px; }
-  .mt-3 { margin-top: 30px; }
-  
-  .mb-0 { margin-bottom: 0; }
-  .mb-1 { margin-bottom: 10px; }
-  .mb-3 { margin-bottom: 30px; }
-  
-  /* Additional dropdown fixes */
-  .mb-2 {
-    margin-bottom: 20px !important;
-    position: relative;
-    z-index: 1;
-  }  /* Ensure enough spacing between dropdowns */
-  #window-selection {
-    margin-bottom: 40px !important;
-    position: relative;
-    z-index: 10;
-  }
-  
-  #file_selection {
-    margin-bottom: 30px !important;
-    position: relative;
-    z-index: 5;
-  }
-  
-  /* Prevent dropdown overlapping issues */
-  .four.columns .mb-2:nth-child(3) {
-    /* This targets the window-selection container */
-    position: relative;
-    z-index: 15 !important;
-  }
-  
-  .four.columns .mb-2:nth-child(4) {
-    /* This targets the file_selection container */
-    position: relative;
-    z-index: 10 !important;
-  }
-  
-  .four.columns .mb-2:nth-last-child(1) {
-    margin-bottom: 40px !important;
-  }
-  
-  .four.columns .mb-2:nth-last-child(2) {
-    margin-bottom: 50px !important;
-  }
+.mt-0 {
+  margin-top: 0;
+}
+.mt-1 {
+  margin-top: 10px;
+}
+.mt-2 {
+  margin-top: 20px;
+}
+.mt-3 {
+  margin-top: 30px;
+}
+
+.mb-0 {
+  margin-bottom: 0;
+}
+.mb-1 {
+  margin-bottom: 10px;
+}
+.mb-3 {
+  margin-bottom: 30px;
+}
+
+/* Additional dropdown fixes */
+.mb-2 {
+  margin-bottom: 20px !important;
+  position: relative;
+  z-index: 1;
+} /* Ensure enough spacing between dropdowns */
+#window-selection {
+  margin-bottom: 40px !important;
+  position: relative;
+  z-index: 10;
+}
+
+#file_selection {
+  margin-bottom: 30px !important;
+  position: relative;
+  z-index: 5;
+}
+
+/* Prevent dropdown overlapping issues */
+.four.columns .mb-2:nth-child(3) {
+  /* This targets the window-selection container */
+  position: relative;
+  z-index: 15 !important;
+}
+
+.four.columns .mb-2:nth-child(4) {
+  /* This targets the file_selection container */
+  position: relative;
+  z-index: 10 !important;
+}
+
+.four.columns .mb-2:nth-last-child(1) {
+  margin-bottom: 40px !important;
+}
+
+.four.columns .mb-2:nth-last-child(2) {
+  margin-bottom: 50px !important;
+}
 
 .p-1 {
   padding: 10px;
