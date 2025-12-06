@@ -9,7 +9,7 @@ import numpy as np
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
 from signalweaver.ecgs.manager import get_ecg, add_ecg
-from signalweaver.dash_files.dash_rep import DashECGSignal
+from signalweaver.traces.trace_rep import TraceECGSignal
 from api.utils import success_response, error_response, numpy_to_list
 
 ecg_bp = Blueprint('ecg', __name__)
@@ -106,7 +106,7 @@ def get_trace():
 
         # Update window length if provided (directly set, bypassing string lookup)
         if window_length is not None:
-            from signalweaver.dash_files.dash_rep import POSSIBLE_LINE_No, POSSIBLE_LINE_HEIGHTS, POSSIBLE_WINDOWS
+            from signalweaver.traces.trace_rep import POSSIBLE_LINE_No, POSSIBLE_LINE_HEIGHTS, POSSIBLE_WINDOWS
             # Find matching window config or set directly
             if window_length in POSSIBLE_WINDOWS.values():
                 # Find the key for this value
@@ -294,7 +294,7 @@ def navigate_poincare():
 
         ecg = get_ecg()
 
-        # Create clickData structure similar to Dash
+        # Create clickData structure
         click_data = {
             'points': [{'pointNumber': point_number}]
         }

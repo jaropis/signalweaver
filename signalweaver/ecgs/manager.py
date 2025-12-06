@@ -17,8 +17,8 @@ def get_ecg(reload=False):
 
     ecg = ECGS.get(name)
     if not ecg or reload:
-        from signalweaver.dash_files.dash_rep import DashECGSignal
-        ecg = DashECGSignal(name)  # this is global an constant for now
+        from signalweaver.traces.trace_rep import TraceECGSignal
+        ecg = TraceECGSignal(name)  # this is global an constant for now
         ECGS.clear()
         ECGS[name] = ecg
     return ecg

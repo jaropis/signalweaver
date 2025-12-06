@@ -1,5 +1,5 @@
 import unittest
-from signalweaver.dash_files.dash_rep import DashECGSignal
+from signalweaver.traces.trace_rep import TraceECGSignal
 
 import json
 
@@ -8,7 +8,7 @@ class TestPoincareClicks(unittest.TestCase):
 
     def setUp(self):
         name = '2017MEN_001rest.csv'
-        self.dash_signal = DashECGSignal(name)
+        self.dash_signal = TraceECGSignal(name)
 
     def test_click_on_PP(self):
         # the json files contain "clicks" recorded while using signalwieaver

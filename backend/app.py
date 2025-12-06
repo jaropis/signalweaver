@@ -3,7 +3,7 @@ from flask_cors import CORS
 import os
 
 app = Flask(__name__)
-app.secret_key = 'sdfasdsadsadaseqrfddfdfgrtbgbhgbnrt'  # Same as original Dash app
+app.secret_key = 'sdfasdsadsadaseqrfddfdfgrtbgbhgbnrt' # Needed for session management
 
 # Configure CORS for frontend communication
 CORS(app, supports_credentials=True)

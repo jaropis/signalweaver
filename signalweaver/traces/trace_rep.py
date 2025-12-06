@@ -10,7 +10,7 @@ POSSIBLE_LINE_HEIGHTS = {'15 s': 4, '1 min': 2, '3 min': 1.5, '5 min': 1, '10 mi
 PHYSICAL_LINE_HEIGHT = 100
 
 
-class DashECGSignal(ECG):
+class TraceECGSignal(ECG):
     def __init__(self, file_path):
         super().__init__(file_path)
         self.n_right_clicks = 0
