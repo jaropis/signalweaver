@@ -388,7 +388,7 @@ class TraceECGSignal(ECG):
         """
         ths function takes data as a pandas dataframe, starting position, window length
         and extracts the time_track, voltage, the time-positions of the peaks and the peak
-        values. It returns two Dash tracks which are then used for the figure creation
+        values. It returns two tracks which are then used for the figure creation
         """
         ############################################################################################################
         # Here is a strange place - this is at this point that I set the object property "self.first_peak_position #

@@ -5,12 +5,14 @@ Professional ECG signal analysis tool for polysomnographic use with automatic QR
 ## New Architecture (Flask + Vue.js)
 
 The application has been migrated to a modern architecture:
+
 - **Backend**: Flask REST API (Python)
 - **Frontend**: Vue.js 3 + Plotly.js (JavaScript)
 
 ## Quick Start
 
 ### Prerequisites
+
 - Python 3.10+
 - Node.js 16+ and npm
 - Virtual environment (recommended)
@@ -18,12 +20,14 @@ The application has been migrated to a modern architecture:
 ### Backend Setup
 
 1. Install Python dependencies:
+
 ```bash
 cd backend
 pip install -r requirements.txt
 ```
 
 2. Start the Flask backend:
+
 ```bash
 # From project root
 PYTHONPATH=/home/jaropis/projects/signalweaver python backend/app.py
@@ -34,12 +38,14 @@ The backend will run on `http://localhost:5001`
 ### Frontend Setup
 
 1. Install Node dependencies:
+
 ```bash
 cd frontend
 npm install
 ```
 
 2. Start the development server:
+
 ```bash
 npm run dev
 ```
@@ -49,6 +55,7 @@ The frontend will run on `http://localhost:5173`
 ### Access the Application
 
 Open your browser and navigate to:
+
 ```
 http://localhost:5173
 ```
@@ -105,38 +112,46 @@ signalweaver/
 ## API Endpoints
 
 ### File Operations
+
 - `GET /api/files` - List available ECG files
 - `POST /api/ecg/load` - Load ECG file
 - `GET /api/ecg/metadata` - Get current ECG metadata
 
 ### ECG Data
+
 - `GET /api/ecg/trace` - Get ECG trace for current window
 - `GET /api/ecg/poincare` - Get Poincaré plot data
 
 ### Manipulation
+
 - `POST /api/ecg/invert` - Toggle ECG inversion
 - `POST /api/ecg/navigate` - Move window left/right
 - `POST /api/ecg/window` - Update window length
 - `POST /api/ecg/navigate/poincare` - Navigate to Poincaré point
 
 ### Annotations
+
 - `POST /api/ecg/peak/classify` - Change peak classification
 - `POST /api/ecg/peak/insert` - Insert new R-wave
 - `POST /api/ecg/peak/remove` - Remove R-wave
 - `POST /api/ecg/save` - Save annotations to JSON
 
 ### Export
+
 - `GET /api/ecg/export/rr` - Download RR intervals file
 
 ## Development
 
 ### Backend Development
+
 The backend uses Flask with automatic reloading in debug mode. Any changes to Python files will auto-reload the server.
 
 ### Frontend Development
+
 Vite provides hot module replacement (HMR). Changes to Vue components will update instantly in the browser.
 
 ### Production Build
+
 ```bash
 cd frontend
 npm run build
@@ -147,12 +162,16 @@ This creates optimized static files in `frontend/dist/` that can be served by Fl
 ## Data Format
 
 ### Input (CSV)
+
 ECG files should be 2-column CSV format:
+
 - Column 1: Time (seconds or datetime)
 - Column 2: Voltage
 
 ### Output (JSON)
+
 Processed results are cached in JSON files with the same name as the CSV:
+
 - R-wave positions and amplitudes
 - Annotations (0=normal, 1=ventricular, 2=supraventricular, 3=artifact)
 - RR intervals
@@ -161,6 +180,7 @@ Processed results are cached in JSON files with the same name as the CSV:
 ## Technology Stack
 
 ### Backend
+
 - Flask 2.3+ - Web framework
 - Flask-CORS - Cross-origin resource sharing
 - NumPy - Numerical computations
@@ -169,21 +189,12 @@ Processed results are cached in JSON files with the same name as the CSV:
 - MNE - R-wave detection
 
 ### Frontend
+
 - Vue.js 3 - UI framework
 - Pinia - State management
 - Axios - HTTP client
 - Plotly.js - Interactive plots
 - Vite - Build tool and dev server
-
-## Migration from Dash
-
-The original Dash-based application is still available in:
-- `dash_gui.py` - Original entry point
-- `app.py` - Dash app configuration
-- `signalweaver/callbacks/` - Dash callbacks
-- `signalweaver/layouts/` - Dash layouts
-
-These files are preserved but no longer used in the new architecture.
 
 ## License
 
