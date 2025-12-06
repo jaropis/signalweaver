@@ -75,6 +75,17 @@ watch(() => store.metadata, (metadata) => {
   }
 })
 
+// Watch for currentFile changes to sync dropdown
+watch(() => store.currentFile, (currentFile) => {
+  if (currentFile) {
+    // Find the matching file value from the files list
+    const matchingFile = store.files.find(f => f.label === currentFile || f.value === currentFile)
+    if (matchingFile) {
+      selectedFile.value = matchingFile.value
+    }
+  }
+})
+
 // Initialize selected file when files load
 watch(() => store.files, (files) => {
   if (files.length > 0 && !selectedFile.value) {

@@ -72,8 +72,10 @@ export const useECGStore = defineStore('ecg', {
     },
 
     async refreshAll() {
+      // Fetch metadata first to get correct position and windowLength
+      await this.fetchMetadata()
+      // Then fetch trace and poincare in parallel (they depend on metadata values)
       await Promise.all([
-        this.fetchMetadata(),
         this.fetchTrace(),
         this.fetchPoincare()
       ])
