@@ -66,38 +66,37 @@ function createFoldedFigure(traceData) {
     const yBaseline = Math.min(...lineVoltage)
     const yMax = Math.max(...lineVoltage.map(v => v - yBaseline))
 
-    // ECG trace
+    // ECG trace - use hovertemplate instead of hoverinfo:'skip' to preserve click detection
     traces.push({
       x: lineTime.map(t => t - currentXShift),
       y: lineVoltage.map(v => (v - yBaseline) / yMax - idx * lineShift),
       mode: 'lines',
-      line: { color: 'black', width: 1 },
+      line: { color: 'black', width: 2 },
       name: 'ECG trace',
-      hoverinfo: 'skip',
+      hovertemplate: '<extra></extra>',
       showlegend: false
     })
 
     // Helper function to add peak markers
+    // IMPORTANT: Always add trace even if empty to maintain consistent curve numbering
     const addPeakMarkers = (peakData, color, label) => {
       const indices = foldIndices(peakData.time, lineIndicesDown, localIndicesUp, startingSample, samplingPeriod)
       const filteredTime = peakData.time.filter((_, i) => indices[i])
       const filteredVoltage = peakData.voltage.filter((_, i) => indices[i])
 
-      if (filteredTime.length > 0) {
-        traces.push({
-          x: filteredTime.map(t => t - currentXShift),
-          y: filteredVoltage.map(v => (v - yBaseline) / yMax + OFFSET_OVER_TRACE - idx * lineShift),
-          mode: 'markers',
-          marker: { size: 12, color },
-          name: label,
-          customdata: filteredTime.map(t => formatTimeForTooltip(t - currentXShift)),
-          hovertemplate: `<b>${label}</b><br>Time: %{customdata}<br><extra></extra>`,
-          showlegend: false
-        })
-      }
+      traces.push({
+        x: filteredTime.map(t => t - currentXShift),
+        y: filteredVoltage.map(v => (v - yBaseline) / yMax + OFFSET_OVER_TRACE - idx * lineShift),
+        mode: 'markers',
+        marker: { size: 12, color },
+        name: label,
+        customdata: filteredTime.map(t => formatTimeForTooltip(t - currentXShift)),
+        hovertemplate: `<b>${label}</b><br>Time: %{customdata}<br><extra></extra>`,
+        showlegend: false
+      })
     }
 
-    // Add all peak types
+    // Add all peak types - must always add all 5 traces per line for correct curve numbering
     addPeakMarkers(peaks.normal, 'green', 'Normal beat')
     addPeakMarkers(peaks.ventricular, 'blue', 'Ventricular beat')
     addPeakMarkers(peaks.supraventricular, 'magenta', 'Supraventricular beat')
@@ -106,6 +105,7 @@ function createFoldedFigure(traceData) {
 
   const layout = {
     hovermode: 'closest',
+    clickmode: 'event',
     height: number_of_lines * single_line_height * PHYSICAL_LINE_HEIGHT,
     showlegend: false,
     margin: { l: 50, r: 50, b: 100, t: 10, pad: 4 },
@@ -125,12 +125,15 @@ function unfoldClickData(clickData, windowConfig) {
   const relativeCurve = curveNumber % 5
   const windowLength = store.windowLength
   const numberOfLines = windowConfig.number_of_lines
+  // xUnfolded reconstructs the absolute time position:
+  // - point.x is the displayed x (absolute_time - currentXShift for that line)
+  // - Adding back lineNumber * lineLength restores the absolute time
   const xUnfolded = point.x + lineNumber * Math.ceil(windowLength / numberOfLines)
 
   return {
     curveNumber: relativeCurve,
     x: xUnfolded,
-    absoluteX: xUnfolded + store.position
+    absoluteX: xUnfolded  // Already absolute time, don't add store.position
   }
 }
 
@@ -142,26 +145,27 @@ async function handlePlotClick(data) {
 
   const { curveNumber, absoluteX } = clickData
 
-  // curveNumber 0 = ECG trace -> insert peak
-  // curveNumber 1 = normal -> classify as normal (0)
-  // curveNumber 2 = ventricular -> classify as ventricular (1)
-  // curveNumber 3 = supraventricular -> classify as supraventricular (2)
-  // curveNumber 4 = artifacts -> remove peak
+  // Click behavior cycles through annotation types:
+  // curveNumber 0 = ECG trace -> insert new peak (default: normal)
+  // curveNumber 1 = normal (green) -> advance to ventricular (blue, annotation 1)
+  // curveNumber 2 = ventricular (blue) -> advance to supraventricular (magenta, annotation 2)
+  // curveNumber 3 = supraventricular (magenta) -> advance to artifact (red, annotation 3)
+  // curveNumber 4 = artifact (red) -> remove peak
 
   if (curveNumber === 0) {
-    // Insert new peak
+    // Insert new peak at clicked position
     await store.insertPeak(absoluteX)
   } else if (curveNumber === 1) {
-    // Classify as normal
-    await store.classifyPeak(absoluteX, 0)
-  } else if (curveNumber === 2) {
-    // Classify as ventricular
+    // Normal -> Ventricular
     await store.classifyPeak(absoluteX, 1)
-  } else if (curveNumber === 3) {
-    // Classify as supraventricular
+  } else if (curveNumber === 2) {
+    // Ventricular -> Supraventricular
     await store.classifyPeak(absoluteX, 2)
+  } else if (curveNumber === 3) {
+    // Supraventricular -> Artifact
+    await store.classifyPeak(absoluteX, 3)
   } else if (curveNumber === 4) {
-    // Remove peak
+    // Artifact -> Remove
     await store.removePeak(absoluteX)
   }
 }
