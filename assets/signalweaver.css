@@ -535,7 +535,7 @@ select {
   transition: all 0.3s ease;
 }
 
-/* Dash dropdown styling */
+/* Dropdown styling */
 .Select-control {
   height: 44px !important;
   border: 2px solid var(--border-color) !important;
@@ -620,7 +620,7 @@ select {
   z-index: 1003 !important;
 }
 
-/* Additional Dash-specific class targeting */
+/* Additional specific class targeting */
 .Select--is-open {
   z-index: 1008 !important;
 }
@@ -630,7 +630,7 @@ select {
   z-index: 1009 !important;
 }
 
-/* Target Dash's specific dropdown wrapper classes */
+/* Target specific dropdown wrapper classes */
 div[id="window-selection"] > div {
   z-index: 1011 !important;
 }
@@ -714,7 +714,7 @@ input[type="checkbox"] {
   align-items: center !important;
 }
 
-/* Dash checklist styling */
+/* Checklist styling */
 .checklist-container label {
   display: inline-flex !important;
   align-items: center !important;
@@ -722,7 +722,7 @@ input[type="checkbox"] {
   margin: 0 !important;
 }
 
-/* Ensure Dash checklist items are properly aligned */
+/* Ensure checklist items are properly aligned */
 #invert-ecg-toggle label {
   display: flex !important;
   align-items: center !important;

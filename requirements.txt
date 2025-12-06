@@ -1,7 +1,5 @@
 chardet
 click
-dash>=2.14.0
-dash-auth
 decorator
 Flask
 Flask-Compress
