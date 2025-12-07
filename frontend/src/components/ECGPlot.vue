@@ -2,7 +2,21 @@
   <div class="ecg-panel panel">
     <div class="ecg-header">
       <span class="ecg-title">ECG Signal</span>
-      <span v-if="store.metadata" class="window-position">{{ windowPositionText }}</span>
+      <div v-if="store.metadata" class="window-controls">
+        <span class="window-position">{{ windowPositionText }}</span>
+        <div class="goto-position">
+          <label for="goto-input">Go to:</label>
+          <input
+            id="goto-input"
+            type="text"
+            v-model="gotoInput"
+            @keyup.enter="handleGotoPosition"
+            placeholder="e.g. 5, 1:30, 2:15:30"
+            class="goto-input"
+          />
+          <button @click="handleGotoPosition" class="goto-button">Go</button>
+        </div>
+      </div>
     </div>
     <div class="plot-wrapper">
       <!-- Left navigation arrow -->
@@ -43,7 +57,46 @@ import Plotly from 'plotly.js-dist-min'
 
 const store = useECGStore()
 const plotDiv = ref(null)
+const gotoInput = ref('')
 let resizeObserver = null
+
+// Parse time input in various formats: "5" (minutes), "1:30" (h:mm or mm:ss), "2:15:30" (h:mm:ss)
+function parseTimeInput(input) {
+  const trimmed = input.trim()
+  if (!trimmed) return null
+
+  const parts = trimmed.split(':').map(p => parseFloat(p.trim()))
+
+  if (parts.some(isNaN)) return null
+
+  if (parts.length === 1) {
+    // Just a number - interpret as minutes
+    return parts[0] * 60
+  } else if (parts.length === 2) {
+    // Two parts - interpret as hours:minutes or minutes:seconds
+    // If first part >= 60, treat as minutes:seconds, otherwise hours:minutes
+    if (parts[0] >= 60) {
+      // minutes:seconds
+      return parts[0] * 60 + parts[1]
+    } else {
+      // hours:minutes (more intuitive for long recordings)
+      return parts[0] * 3600 + parts[1] * 60
+    }
+  } else if (parts.length === 3) {
+    // Three parts - hours:minutes:seconds
+    return parts[0] * 3600 + parts[1] * 60 + parts[2]
+  }
+
+  return null
+}
+
+async function handleGotoPosition() {
+  const seconds = parseTimeInput(gotoInput.value)
+  if (seconds !== null && seconds >= 0) {
+    await store.navigateToPosition(seconds)
+    gotoInput.value = ''
+  }
+}
 
 // Format time duration for display (e.g., "5 min" or "2 hours 30 min")
 function formatDuration(seconds) {
@@ -333,10 +386,64 @@ onUnmounted(() => {
   letter-spacing: 0.05em;
 }
 
+.window-controls {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
 .window-position {
   font-size: 1.1rem;
   font-weight: 500;
   color: var(--color-text-primary);
+}
+
+.goto-position {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.goto-position label {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+
+.goto-input {
+  width: 120px;
+  padding: 4px 8px;
+  font-size: 0.85rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+}
+
+.goto-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.goto-input::placeholder {
+  color: var(--color-text-secondary);
+  opacity: 0.6;
+}
+
+.goto-button {
+  padding: 4px 12px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.goto-button:hover {
+  background: var(--color-background);
+  border-color: var(--color-primary);
 }
 
 .plot-wrapper {

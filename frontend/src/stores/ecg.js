@@ -180,6 +180,20 @@ export const useECGStore = defineStore('ecg', {
       }
     },
 
+    async navigateToPosition(positionInSeconds) {
+      // Clamp position to valid range
+      if (this.metadata) {
+        const maxPosition = Math.max(0, this.metadata.duration - this.windowLength)
+        positionInSeconds = Math.max(0, Math.min(positionInSeconds, maxPosition))
+      }
+      this.position = positionInSeconds
+      try {
+        await this.fetchTrace()
+      } catch (error) {
+        this.error = error.message
+      }
+    },
+
     async classifyPeak(timePosition, annotation) {
       try {
         const result = await api.classifyPeak(timePosition, annotation)
