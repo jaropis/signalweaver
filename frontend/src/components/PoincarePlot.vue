@@ -1,18 +1,19 @@
 <template>
-  <div class="panel">
-    <h3>📊 Poincaré Plot</h3>
+  <div class="poincare-wrapper" ref="wrapperDiv">
     <div v-if="store.poincareData" ref="plotDiv" class="plot-container"></div>
     <div v-else class="loading">Loading Poincaré data...</div>
   </div>
 </template>
 
 <script setup>
-import { ref, watch, onMounted, nextTick } from 'vue'
+import { ref, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useECGStore } from '../stores/ecg'
 import Plotly from 'plotly.js-dist-min'
 
 const store = useECGStore()
 const plotDiv = ref(null)
+const wrapperDiv = ref(null)
+let resizeObserver = null
 
 async function handlePlotClick(data) {
   if (!data || !data.points || data.points.length === 0) return
@@ -22,10 +23,15 @@ async function handlePlotClick(data) {
 }
 
 function renderPlot() {
-  if (!plotDiv.value || !store.poincareData) return
+  if (!plotDiv.value || !store.poincareData || !wrapperDiv.value) return
 
   const { xi, xii, range } = store.poincareData
-  const plotSize = 700
+
+  // Get container dimensions for responsive sizing
+  const containerWidth = wrapperDiv.value.clientWidth
+  const containerHeight = wrapperDiv.value.clientHeight
+  // Use the smaller dimension to keep the plot square, with some padding
+  const plotSize = Math.min(containerWidth - 20, containerHeight - 20, 700)
 
   const trace = {
     x: xi,
@@ -75,6 +81,13 @@ function renderPlot() {
   plotDiv.value.on('plotly_click', handlePlotClick)
 }
 
+// Handle container resize
+function handleResize() {
+  if (store.poincareData) {
+    renderPlot()
+  }
+}
+
 watch(() => store.poincareData, async () => {
   await nextTick()
   renderPlot()
@@ -84,14 +97,43 @@ onMounted(() => {
   if (store.poincareData) {
     renderPlot()
   }
+
+  // Set up resize observer to re-render on container size change
+  if (wrapperDiv.value) {
+    resizeObserver = new ResizeObserver(() => {
+      handleResize()
+    })
+    resizeObserver.observe(wrapperDiv.value)
+  }
+})
+
+onUnmounted(() => {
+  if (resizeObserver) {
+    resizeObserver.disconnect()
+  }
 })
 </script>
 
 <style scoped>
+.poincare-wrapper {
+  width: 100%;
+  height: 100%;
+  min-height: 400px;
+}
+
 .plot-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 400px;
+  width: 100%;
+  height: 100%;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  color: #667eea;
 }
 </style>
