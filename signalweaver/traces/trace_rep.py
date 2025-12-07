@@ -4,9 +4,9 @@ import plotly.graph_objs as go
 
 from ..signal_classes import ECG
 
-POSSIBLE_WINDOWS = {'15 s': 15, '1 min': 60, '3 min': 3 * 60, '5 min': 5 * 60, '10 min': 10 * 60}
-POSSIBLE_LINE_No = {'15 s': 1, '1 min': 3, '3 min': 5, '5 min': 10, '10 min': 20}
-POSSIBLE_LINE_HEIGHTS = {'15 s': 4, '1 min': 2, '3 min': 1.5, '5 min': 1, '10 min': 0.8}
+POSSIBLE_WINDOWS = {'15 s': 15, '1 min': 60, '3 min': 3 * 60, '5 min': 5 * 60, '10 min': 10 * 60, '20 min': 20 * 60}
+POSSIBLE_LINE_No = {'15 s': 1, '1 min': 3, '3 min': 5, '5 min': 10, '10 min': 20, '20 min': 20}
+POSSIBLE_LINE_HEIGHTS = {'15 s': 4, '1 min': 2, '3 min': 1.5, '5 min': 1, '10 min': 0.8, '20 min': 0.8}
 PHYSICAL_LINE_HEIGHT = 100
 
 
