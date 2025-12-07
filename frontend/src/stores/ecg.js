@@ -23,7 +23,7 @@ export const useECGStore = defineStore('ecg', {
     saveStatus: null,
 
     // Window configuration
-    windowLength: 60,
+    windowLength: 300,  // Default to 5 minutes (matches backend default for long recordings)
     position: 0,
 
     // Available window options (matching backend)

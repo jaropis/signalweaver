@@ -34,7 +34,6 @@
           <select
             class="form-select"
             v-model="selectedFile"
-            @change="handleFileChange"
             :disabled="store.loading"
           >
             <option
@@ -52,7 +51,6 @@
           <select
             class="form-select"
             v-model="selectedWindow"
-            @change="handleWindowChange"
             :disabled="store.loading"
           >
             <option
@@ -69,7 +67,6 @@
           <input
             type="checkbox"
             v-model="inverted"
-            @change="handleInvert"
             :disabled="store.loading"
           />
           <span>Invert ECG</span>
@@ -101,11 +98,34 @@ import api from '../services/api'
 const store = useECGStore()
 
 const isOpen = ref(true)
-const inverted = ref(false)
-const selectedWindow = ref(60)
-const selectedFile = ref(null)
 
 const exportURL = computed(() => api.getExportURL())
+
+// Computed with getter/setter for window length - binds directly to store
+const selectedWindow = computed({
+  get: () => store.windowLength,
+  set: (value) => store.updateWindowLength(value)
+})
+
+// Computed with getter/setter for file selection - derives from store.currentFile
+const selectedFile = computed({
+  get: () => {
+    if (!store.currentFile || store.files.length === 0) return null
+    const matchingFile = store.files.find(f => f.label === store.currentFile)
+    return matchingFile?.value ?? null
+  },
+  set: (value) => {
+    if (value) {
+      store.loadECG(value)
+    }
+  }
+})
+
+// Computed for inverted checkbox - binds directly to store metadata
+const inverted = computed({
+  get: () => store.metadata?.inverted ?? false,
+  set: () => store.invertECG()
+})
 
 // Navigation functions
 async function moveLeft() {
@@ -116,46 +136,12 @@ async function moveRight() {
   await store.navigate('right')
 }
 
-// Control functions
-async function handleInvert() {
-  await store.invertECG()
-}
-
-async function handleWindowChange() {
-  await store.updateWindowLength(selectedWindow.value)
-}
-
-async function handleFileChange() {
-  if (selectedFile.value) {
-    await store.loadECG(selectedFile.value)
-  }
-}
-
-// Watch for metadata changes to update inverted state
-watch(() => store.metadata, (metadata) => {
-  if (metadata) {
-    inverted.value = metadata.inverted
-    selectedWindow.value = metadata.window_length
-  }
-})
-
-// Watch for currentFile changes to sync dropdown
-watch(() => store.currentFile, (currentFile) => {
-  if (currentFile) {
-    const matchingFile = store.files.find(f => f.label === currentFile || f.value === currentFile)
-    if (matchingFile) {
-      selectedFile.value = matchingFile.value
-    }
-  }
-})
-
-// Initialize selected file when files load
+// Initialize: load first file when files become available
 watch(() => store.files, (files) => {
-  if (files.length > 0 && !selectedFile.value) {
-    selectedFile.value = files[0].value
-    store.loadECG(selectedFile.value)
+  if (files.length > 0 && !store.currentFile) {
+    store.loadECG(files[0].value)
   }
-})
+}, { immediate: true })
 </script>
 
 <style scoped>

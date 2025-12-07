@@ -6,7 +6,7 @@
       <input
         type="checkbox"
         id="invert"
-        v-model="inverted"
+        :checked="store.metadata?.inverted ?? false"
         @change="handleInvert"
         :disabled="store.loading"
       />
@@ -22,8 +22,7 @@
     <div class="form-group">
       <label>Select viewing length</label>
       <select
-        v-model="selectedWindow"
-        @change="handleWindowChange"
+        v-model="windowLengthModel"
         :disabled="store.loading"
       >
         <option
@@ -39,8 +38,7 @@
     <div class="form-group">
       <label>Select file</label>
       <select
-        v-model="selectedFile"
-        @change="handleFileChange"
+        v-model="selectedFileModel"
         :disabled="store.loading"
       >
         <option
@@ -56,55 +54,42 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { computed, watch } from 'vue'
 import { useECGStore } from '../stores/ecg'
 import api from '../services/api'
 
 const store = useECGStore()
-const inverted = ref(false)
-const selectedWindow = ref(60)
-const selectedFile = ref(null)
 
 const exportURL = computed(() => api.getExportURL())
 
-// Watch for metadata changes to update inverted state
-watch(() => store.metadata, (metadata) => {
-  if (metadata) {
-    inverted.value = metadata.inverted
-    selectedWindow.value = metadata.window_length
-  }
+// Computed with getter/setter for window length
+const windowLengthModel = computed({
+  get: () => store.windowLength,
+  set: (value) => store.updateWindowLength(value)
 })
 
-// Watch for currentFile changes to sync dropdown
-watch(() => store.currentFile, (currentFile) => {
-  if (currentFile) {
-    // Find the matching file value from the files list
-    const matchingFile = store.files.find(f => f.label === currentFile || f.value === currentFile)
-    if (matchingFile) {
-      selectedFile.value = matchingFile.value
+// Computed with getter/setter for file selection
+const selectedFileModel = computed({
+  get: () => {
+    if (!store.currentFile || store.files.length === 0) return null
+    const matchingFile = store.files.find(f => f.label === store.currentFile)
+    return matchingFile?.value ?? null
+  },
+  set: (value) => {
+    if (value) {
+      store.loadECG(value)
     }
   }
 })
 
-// Initialize selected file when files load
+// Initialize: load first file when files become available
 watch(() => store.files, (files) => {
-  if (files.length > 0 && !selectedFile.value) {
-    selectedFile.value = files[0].value
-    store.loadECG(selectedFile.value)
+  if (files.length > 0 && !store.currentFile) {
+    store.loadECG(files[0].value)
   }
-})
+}, { immediate: true })
 
 async function handleInvert() {
   await store.invertECG()
-}
-
-async function handleWindowChange() {
-  await store.updateWindowLength(selectedWindow.value)
-}
-
-async function handleFileChange() {
-  if (selectedFile.value) {
-    await store.loadECG(selectedFile.value)
-  }
 }
 </script>
