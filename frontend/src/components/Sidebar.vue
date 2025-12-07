@@ -135,13 +135,6 @@ async function moveLeft() {
 async function moveRight() {
   await store.navigate('right')
 }
-
-// Initialize: load first file when files become available
-watch(() => store.files, (files) => {
-  if (files.length > 0 && !store.currentFile) {
-    store.loadECG(files[0].value)
-  }
-}, { immediate: true })
 </script>
 
 <style scoped>

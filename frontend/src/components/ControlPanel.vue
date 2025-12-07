@@ -54,7 +54,7 @@
 </template>
 
 <script setup>
-import { computed, watch } from 'vue'
+import { computed } from 'vue'
 import { useECGStore } from '../stores/ecg'
 import api from '../services/api'
 
@@ -81,13 +81,6 @@ const selectedFileModel = computed({
     }
   }
 })
-
-// Initialize: load first file when files become available
-watch(() => store.files, (files) => {
-  if (files.length > 0 && !store.currentFile) {
-    store.loadECG(files[0].value)
-  }
-}, { immediate: true })
 
 async function handleInvert() {
   await store.invertECG()
