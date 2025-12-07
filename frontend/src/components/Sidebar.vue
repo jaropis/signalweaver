@@ -1,48 +1,38 @@
 <template>
-  <div class="sidebar-container" :class="{ collapsed: !isOpen }">
-    <!-- Toggle button -->
-    <button
-      class="sidebar-toggle"
-      @click="isOpen = !isOpen"
-      :title="isOpen ? 'Collapse sidebar' : 'Expand sidebar'"
-    >
-      <span class="toggle-arrow">{{ isOpen ? '‹' : '›' }}</span>
-    </button>
-
+  <div class="sidebar" :class="{ collapsed: !isOpen }">
     <!-- Sidebar content -->
     <div class="sidebar-content" v-show="isOpen">
       <!-- Navigation Section -->
       <div class="sidebar-section">
-        <h4>Navigation</h4>
+        <div class="section-title">Navigation</div>
         <div class="nav-buttons">
           <button
             class="nav-btn"
             @click="moveLeft"
             :disabled="store.loading"
-            title="Move Left"
           >
-            <span class="btn-icon">←</span>
-            <span class="btn-text">Left</span>
+            <v-icon size="16">mdi-chevron-left</v-icon>
+            <span>Left</span>
           </button>
           <button
             class="nav-btn"
             @click="moveRight"
             :disabled="store.loading"
-            title="Move Right"
           >
-            <span class="btn-icon">→</span>
-            <span class="btn-text">Right</span>
+            <span>Right</span>
+            <v-icon size="16">mdi-chevron-right</v-icon>
           </button>
         </div>
       </div>
 
       <!-- Controls Section -->
       <div class="sidebar-section">
-        <h4>Controls</h4>
+        <div class="section-title">Controls</div>
 
-        <div class="control-item">
-          <label>File</label>
+        <div class="form-group">
+          <label class="form-label">File</label>
           <select
+            class="form-select"
             v-model="selectedFile"
             @change="handleFileChange"
             :disabled="store.loading"
@@ -57,9 +47,10 @@
           </select>
         </div>
 
-        <div class="control-item">
-          <label>Window</label>
+        <div class="form-group">
+          <label class="form-label">Window</label>
           <select
+            class="form-select"
             v-model="selectedWindow"
             @change="handleWindowChange"
             :disabled="store.loading"
@@ -74,25 +65,31 @@
           </select>
         </div>
 
-        <div class="control-item checkbox">
+        <label class="form-checkbox">
           <input
             type="checkbox"
-            id="sidebar-invert"
             v-model="inverted"
             @change="handleInvert"
             :disabled="store.loading"
           />
-          <label for="sidebar-invert">Invert ECG</label>
-        </div>
+          <span>Invert ECG</span>
+        </label>
 
-        <div class="control-item">
-          <a :href="exportURL" class="download-btn" download>
-            <span class="btn-icon">↓</span>
-            <span class="btn-text">Download RRs</span>
-          </a>
-        </div>
+        <a :href="exportURL" class="download-link" download>
+          <v-icon size="14">mdi-download</v-icon>
+          <span>Export RR Intervals</span>
+        </a>
       </div>
     </div>
+
+    <!-- Toggle button - positioned to align with track center -->
+    <button
+      class="sidebar-toggle"
+      @click="isOpen = !isOpen"
+      :title="isOpen ? 'Collapse sidebar' : 'Expand sidebar'"
+    >
+      <v-icon size="18">{{ isOpen ? 'mdi-chevron-left' : 'mdi-chevron-right' }}</v-icon>
+    </button>
   </div>
 </template>
 
@@ -162,99 +159,106 @@ watch(() => store.files, (files) => {
 </script>
 
 <style scoped>
-.sidebar-container {
+.sidebar {
   position: relative;
   display: flex;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: width 0.3s ease;
-  width: 180px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  transition: width 0.2s ease;
+  width: 200px;
   flex-shrink: 0;
+  align-self: stretch;
 }
 
-.sidebar-container.collapsed {
-  width: 32px;
+.sidebar.collapsed {
+  width: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
 }
 
 .sidebar-toggle {
   position: absolute;
-  right: -12px;
+  right: -14px;
   top: 50%;
   transform: translateY(-50%);
-  width: 24px;
-  height: 48px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border: none;
-  border-radius: 0 6px 6px 0;
-  color: white;
+  width: 28px;
+  height: 56px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  color: var(--color-text-secondary);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 10;
   padding: 0;
-  font-size: 16px;
-  font-weight: bold;
-  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+  transition: all var(--transition);
 }
 
 .sidebar-toggle:hover {
-  background: linear-gradient(135deg, #5568d3 0%, #653a91 100%);
+  background: #f5f5f5;
+  color: var(--color-text-primary);
 }
 
-.toggle-arrow {
-  line-height: 1;
+.sidebar.collapsed .sidebar-toggle {
+  right: -28px;
+  border-left: 1px solid var(--color-border);
 }
 
 .sidebar-content {
-  padding: 12px;
+  padding: 16px;
   width: 100%;
   overflow: hidden;
 }
 
 .sidebar-section {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 .sidebar-section:last-child {
   margin-bottom: 0;
 }
 
-.sidebar-section h4 {
-  color: #667eea;
-  font-size: 12px;
+.section-title {
+  font-size: 0.7rem;
   font-weight: 600;
+  color: var(--color-text-muted);
   text-transform: uppercase;
+  letter-spacing: 0.05em;
   margin-bottom: 10px;
-  padding-bottom: 4px;
-  border-bottom: 1px solid #eee;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .nav-buttons {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .nav-btn {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 8px 10px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  border-radius: 4px;
+  gap: 4px;
+  padding: 8px 12px;
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 500;
-  transition: all 0.2s;
+  transition: all var(--transition);
 }
 
 .nav-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #5568d3 0%, #653a91 100%);
+  background: #f5f5f5;
+  border-color: #bdbdbd;
 }
 
 .nav-btn:disabled {
@@ -262,84 +266,70 @@ watch(() => store.files, (files) => {
   cursor: not-allowed;
 }
 
-.btn-icon {
-  font-size: 14px;
+.form-group {
+  margin-bottom: 12px;
 }
 
-.btn-text {
-  font-size: 11px;
-}
-
-.control-item {
-  margin-bottom: 10px;
-}
-
-.control-item:last-child {
-  margin-bottom: 0;
-}
-
-.control-item label {
+.form-label {
   display: block;
-  font-size: 11px;
-  color: #555;
-  margin-bottom: 4px;
+  font-size: 0.7rem;
   font-weight: 500;
+  color: var(--color-text-secondary);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
-.control-item select {
+.form-select {
   width: 100%;
   padding: 6px 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 11px;
-  background: white;
+  font-size: 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  transition: border-color var(--transition);
 }
 
-.control-item select:focus {
+.form-select:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: var(--color-accent);
 }
 
-.control-item.checkbox {
+.form-checkbox {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  font-size: 0.75rem;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  margin-bottom: 12px;
 }
 
-.control-item.checkbox label {
-  display: inline;
-  margin-bottom: 0;
-  font-size: 11px;
-}
-
-.control-item.checkbox input[type="checkbox"] {
+.form-checkbox input[type="checkbox"] {
   width: 14px;
   height: 14px;
   cursor: pointer;
 }
 
-.download-btn {
+.download-link {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  padding: 8px 10px;
-  background: #f8f9fa;
-  color: #667eea;
-  border: 1px solid #667eea;
-  border-radius: 4px;
+  gap: 6px;
+  padding: 8px 12px;
+  font-size: 0.75rem;
+  color: var(--color-accent);
   text-decoration: none;
-  font-size: 11px;
-  font-weight: 500;
-  transition: all 0.2s;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  transition: all var(--transition);
+  width: 100%;
 }
 
-.download-btn:hover {
-  background: #667eea;
+.download-link:hover {
+  background: var(--color-accent);
   color: white;
-}
-
-.download-btn .btn-icon {
-  font-size: 12px;
+  border-color: var(--color-accent);
 }
 </style>

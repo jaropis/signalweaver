@@ -1,32 +1,35 @@
 <template>
-  <div id="app">
+  <v-app>
     <Header />
 
-    <div v-if="store.error" class="error">
-      <strong>Error:</strong> {{ store.error }}
-      <button @click="store.error = null" style="float: right; padding: 2px 8px;">✕</button>
+    <div v-if="store.error" class="error-banner">
+      <span><strong>Error:</strong> {{ store.error }}</span>
+      <button @click="store.error = null">
+        <v-icon size="small">mdi-close</v-icon>
+      </button>
     </div>
 
-    <div v-if="store.loading && !store.metadata" class="loading">
+    <div v-if="store.loading && !store.metadata" class="loading-state">
+      <v-progress-circular indeterminate size="24" width="2" class="mr-3"></v-progress-circular>
       Loading...
     </div>
 
     <template v-else>
+      <!-- Poincare Toggle - above everything -->
+      <div class="poincare-toggle-row">
+        <PoincareToggle
+          :isOpen="showPoincareWindow"
+          @toggle="showPoincareWindow = !showPoincareWindow"
+        />
+      </div>
+
       <!-- Main content area with sidebar -->
-      <div class="main-content">
+      <div class="app-main">
         <!-- Sidebar -->
         <Sidebar />
 
         <!-- ECG area -->
         <div class="ecg-area">
-          <!-- Poincare Toggle - directly above ECG panel -->
-          <div class="poincare-toggle-row">
-            <PoincareToggle
-              :isOpen="showPoincareWindow"
-              @toggle="showPoincareWindow = !showPoincareWindow"
-            />
-          </div>
-
           <!-- ECG Plot -->
           <ECGPlot />
 
@@ -37,7 +40,7 @@
 
       <!-- Floating Poincare Plot Window -->
       <FloatingWindow
-        title="Poincaré Plot"
+        title="Poincare Plot"
         :visible="showPoincareWindow"
         :initialWidth="750"
         :initialHeight="800"
@@ -48,7 +51,7 @@
         <PoincarePlot />
       </FloatingWindow>
     </template>
-  </div>
+  </v-app>
 </template>
 
 <script setup>
@@ -89,3 +92,9 @@ onUnmounted(() => {
   window.removeEventListener('keydown', handleKeydown)
 })
 </script>
+
+<style scoped>
+.poincare-toggle-row {
+  padding: 8px 16px 0 16px;
+}
+</style>

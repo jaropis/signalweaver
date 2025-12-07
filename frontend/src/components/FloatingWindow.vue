@@ -174,9 +174,10 @@ onUnmounted(() => {
 <style scoped>
 .floating-window {
   position: fixed;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -186,52 +187,53 @@ onUnmounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 15px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  padding: 10px 16px;
+  background: #fafafa;
+  border-bottom: 1px solid var(--color-border);
   cursor: move;
   user-select: none;
 }
 
 .floating-window-title {
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 0.85rem;
+  color: var(--color-text-primary);
 }
 
 .floating-window-close {
-  background: rgba(255, 255, 255, 0.2);
+  background: transparent;
   border: none;
-  color: white;
+  color: var(--color-text-secondary);
   width: 28px;
   height: 28px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 14px;
   padding: 0;
-  transition: background 0.2s;
+  transition: all 0.2s;
 }
 
 .floating-window-close:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--color-text-primary);
 }
 
 .floating-window-content {
   flex: 1;
   overflow: auto;
-  padding: 15px;
+  padding: 16px;
 }
 
 .floating-window-resize {
   position: absolute;
   bottom: 0;
   right: 0;
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   cursor: nwse-resize;
-  background: linear-gradient(135deg, transparent 50%, rgba(102, 126, 234, 0.3) 50%);
 }
 
 .floating-window-resize::after {
@@ -239,9 +241,9 @@ onUnmounted(() => {
   position: absolute;
   bottom: 4px;
   right: 4px;
-  width: 8px;
-  height: 8px;
-  border-right: 2px solid #667eea;
-  border-bottom: 2px solid #667eea;
+  width: 6px;
+  height: 6px;
+  border-right: 2px solid var(--color-border);
+  border-bottom: 2px solid var(--color-border);
 }
 </style>

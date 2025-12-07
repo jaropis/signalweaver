@@ -1,6 +1,8 @@
 <template>
-  <div class="panel ecg-panel">
-    <h3>ECG Signal</h3>
+  <div class="ecg-panel panel">
+    <div class="ecg-header">
+      <span class="ecg-title">ECG Signal</span>
+    </div>
     <div class="plot-wrapper">
       <!-- Left navigation arrow -->
       <button
@@ -9,11 +11,11 @@
         :disabled="store.loading"
         title="Move Left (← arrow key)"
       >
-        ‹
+        <v-icon size="48">mdi-chevron-left</v-icon>
       </button>
 
       <div v-if="store.traceData" ref="plotDiv" class="plot-container"></div>
-      <div v-else class="loading">Loading ECG data...</div>
+      <div v-else class="loading-state">Loading ECG data...</div>
 
       <!-- Right navigation arrow -->
       <button
@@ -22,7 +24,7 @@
         :disabled="store.loading"
         title="Move Right (→ arrow key)"
       >
-        ›
+        <v-icon size="48">mdi-chevron-right</v-icon>
       </button>
     </div>
   </div>
@@ -229,15 +231,42 @@ onMounted(() => {
 
 <style scoped>
 .ecg-panel {
-  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.ecg-header {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.ecg-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .plot-wrapper {
   position: relative;
+  flex: 1;
+  padding: 8px;
 }
 
 .plot-container {
   min-height: 400px;
+  width: 100%;
+}
+
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
 }
 
 .nav-arrow {
@@ -245,25 +274,22 @@ onMounted(() => {
   top: 50%;
   transform: translateY(-50%);
   z-index: 10;
-  background: rgba(102, 126, 234, 0.3);
-  color: rgba(102, 126, 234, 0.8);
+  background: rgba(158, 158, 158, 0.15);
+  color: rgba(97, 97, 97, 0.5);
   border: none;
-  font-size: 72px;
-  font-weight: 300;
-  width: 60px;
-  height: 120px;
+  width: 48px;
+  height: 96px;
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
-  line-height: 1;
 }
 
 .nav-arrow:hover:not(:disabled) {
-  background: rgba(102, 126, 234, 0.5);
-  color: rgba(102, 126, 234, 1);
+  background: rgba(158, 158, 158, 0.25);
+  color: rgba(97, 97, 97, 0.8);
 }
 
 .nav-arrow:disabled {
@@ -272,12 +298,12 @@ onMounted(() => {
 }
 
 .nav-arrow-left {
-  left: 10px;
-  border-radius: 8px;
+  left: 16px;
+  border-radius: var(--radius-sm);
 }
 
 .nav-arrow-right {
-  right: 10px;
-  border-radius: 8px;
+  right: 16px;
+  border-radius: var(--radius-sm);
 }
 </style>

@@ -3,10 +3,10 @@
     class="poincare-toggle"
     :class="{ 'is-open': isOpen }"
     @click="$emit('toggle')"
-    :title="isOpen ? 'Close Poincaré Plot' : 'Open Poincaré Plot'"
+    :title="isOpen ? 'Close Poincare Plot' : 'Open Poincare Plot'"
   >
-    <span class="toggle-icon">{{ isOpen ? '−' : '+' }}</span>
-    <span class="toggle-text">Poincaré</span>
+    <v-icon size="14">{{ isOpen ? 'mdi-minus' : 'mdi-plus' }}</v-icon>
+    <span class="toggle-text">Poincare Plot</span>
   </button>
 </template>
 
@@ -25,37 +25,31 @@ defineEmits(['toggle'])
 .poincare-toggle {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 8px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  border-radius: 4px;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  font-size: 11px;
+  font-size: 0.75rem;
   font-weight: 500;
   transition: all 0.2s ease;
-  box-shadow: 0 1px 4px rgba(102, 126, 234, 0.3);
 }
 
 .poincare-toggle:hover {
-  box-shadow: 0 2px 6px rgba(102, 126, 234, 0.4);
+  background: #f5f5f5;
+  color: var(--color-text-primary);
 }
 
 .poincare-toggle.is-open {
-  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  background: var(--color-accent);
+  color: white;
+  border-color: var(--color-accent);
 }
 
-.toggle-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 14px;
-  height: 14px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 2px;
-  font-size: 12px;
-  font-weight: bold;
+.poincare-toggle.is-open:hover {
+  background: var(--color-accent-hover);
 }
 
 .toggle-text {

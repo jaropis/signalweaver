@@ -134,6 +134,7 @@ onUnmounted(() => {
   justify-content: center;
   align-items: center;
   height: 100%;
-  color: #667eea;
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
 }
 </style>
