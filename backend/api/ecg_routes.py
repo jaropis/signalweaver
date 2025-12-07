@@ -269,7 +269,19 @@ def update_window():
             return error_response('window_length is required', 400)
 
         ecg = get_ecg()
-        ecg.update_window_length(window_length)
+
+        # Convert numeric window_length to string key expected by update_window_length
+        from signalweaver.traces.trace_rep import POSSIBLE_WINDOWS
+        window_key = None
+        for key, value in POSSIBLE_WINDOWS.items():
+            if value == window_length:
+                window_key = key
+                break
+
+        if window_key is None:
+            return error_response(f'Invalid window_length: {window_length}. Valid values: {list(POSSIBLE_WINDOWS.values())}', 400)
+
+        ecg.update_window_length(window_key)
 
         return success_response({
             'window_length': float(ecg.window_length),
