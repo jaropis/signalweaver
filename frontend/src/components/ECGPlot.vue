@@ -2,6 +2,7 @@
   <div class="ecg-panel panel">
     <div class="ecg-header">
       <span class="ecg-title">ECG Signal</span>
+      <span v-if="store.metadata" class="window-position">{{ windowPositionText }}</span>
     </div>
     <div class="plot-wrapper">
       <!-- Left navigation arrow -->
@@ -36,13 +37,56 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, watch, onMounted, onUnmounted, nextTick, computed } from 'vue'
 import { useECGStore } from '../stores/ecg'
 import Plotly from 'plotly.js-dist-min'
 
 const store = useECGStore()
 const plotDiv = ref(null)
 let resizeObserver = null
+
+// Format time duration for display (e.g., "5 min" or "2 hours 30 min")
+function formatDuration(seconds) {
+  if (seconds < 60) {
+    return `${Math.round(seconds)} s`
+  } else if (seconds < 3600) {
+    const minutes = Math.round(seconds / 60)
+    return `${minutes} min`
+  } else {
+    const hours = Math.floor(seconds / 3600)
+    const minutes = Math.round((seconds % 3600) / 60)
+    if (minutes === 0) {
+      return `${hours} hour${hours !== 1 ? 's' : ''}`
+    }
+    return `${hours} hour${hours !== 1 ? 's' : ''} ${minutes} min`
+  }
+}
+
+// Format position as minutes or hours:minutes
+function formatPosition(seconds) {
+  if (seconds < 3600) {
+    return `${Math.round(seconds / 60)} min`
+  } else {
+    const hours = Math.floor(seconds / 3600)
+    const minutes = Math.round((seconds % 3600) / 60)
+    return `${hours}:${minutes.toString().padStart(2, '0')}`
+  }
+}
+
+// Computed property for window position text
+const windowPositionText = computed(() => {
+  if (!store.metadata) return ''
+
+  const position = store.position
+  const windowLength = store.windowLength
+  const totalDuration = store.metadata.duration
+
+  const startPos = formatPosition(position)
+  const endPos = formatPosition(position + windowLength)
+  const total = formatDuration(totalDuration)
+
+  return `window position: ${startPos} - ${endPos} of ${total}`
+})
 
 // Navigation functions
 async function navigateLeft() {
@@ -147,9 +191,19 @@ function createFoldedFigure(traceData) {
     clickmode: 'event',
     height: number_of_lines * single_line_height * PHYSICAL_LINE_HEIGHT,
     showlegend: false,
-    margin: { l: 50, r: 50, b: 100, t: 10, pad: 4 },
-    xaxis: { showgrid: true },
-    yaxis: { showgrid: false, zeroline: false }
+    margin: { l: 10, r: 10, b: 10, t: 10, pad: 4 },
+    xaxis: {
+      showgrid: false,
+      showticklabels: false,
+      zeroline: false,
+      showline: false
+    },
+    yaxis: {
+      showgrid: false,
+      showticklabels: false,
+      zeroline: false,
+      showline: false
+    }
   }
 
   return { traces, layout }
@@ -266,6 +320,9 @@ onUnmounted(() => {
 .ecg-header {
   padding: 10px 16px;
   border-bottom: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .ecg-title {
@@ -274,6 +331,12 @@ onUnmounted(() => {
   color: var(--color-text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+}
+
+.window-position {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
 }
 
 .plot-wrapper {
