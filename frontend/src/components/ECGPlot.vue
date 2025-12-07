@@ -1,8 +1,30 @@
 <template>
-  <div class="panel">
-    <h3>💓 ECG Signal</h3>
-    <div v-if="store.traceData" ref="plotDiv" class="plot-container"></div>
-    <div v-else class="loading">Loading ECG data...</div>
+  <div class="panel ecg-panel">
+    <h3>ECG Signal</h3>
+    <div class="plot-wrapper">
+      <!-- Left navigation arrow -->
+      <button
+        class="nav-arrow nav-arrow-left"
+        @click="navigateLeft"
+        :disabled="store.loading"
+        title="Move Left (← arrow key)"
+      >
+        ‹
+      </button>
+
+      <div v-if="store.traceData" ref="plotDiv" class="plot-container"></div>
+      <div v-else class="loading">Loading ECG data...</div>
+
+      <!-- Right navigation arrow -->
+      <button
+        class="nav-arrow nav-arrow-right"
+        @click="navigateRight"
+        :disabled="store.loading"
+        title="Move Right (→ arrow key)"
+      >
+        ›
+      </button>
+    </div>
   </div>
 </template>
 
@@ -13,6 +35,15 @@ import Plotly from 'plotly.js-dist-min'
 
 const store = useECGStore()
 const plotDiv = ref(null)
+
+// Navigation functions
+async function navigateLeft() {
+  await store.navigate('left')
+}
+
+async function navigateRight() {
+  await store.navigate('right')
+}
 
 // Constants from original implementation
 const PHYSICAL_LINE_HEIGHT = 100
@@ -197,7 +228,56 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.ecg-panel {
+  position: relative;
+}
+
+.plot-wrapper {
+  position: relative;
+}
+
 .plot-container {
   min-height: 400px;
+}
+
+.nav-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  background: rgba(102, 126, 234, 0.3);
+  color: rgba(102, 126, 234, 0.8);
+  border: none;
+  font-size: 72px;
+  font-weight: 300;
+  width: 60px;
+  height: 120px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+}
+
+.nav-arrow:hover:not(:disabled) {
+  background: rgba(102, 126, 234, 0.5);
+  color: rgba(102, 126, 234, 1);
+}
+
+.nav-arrow:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.nav-arrow-left {
+  left: 10px;
+  border-radius: 8px;
+}
+
+.nav-arrow-right {
+  right: 10px;
+  border-radius: 8px;
 }
 </style>

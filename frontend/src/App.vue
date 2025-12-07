@@ -52,7 +52,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useECGStore } from './stores/ecg'
 import Header from './components/Header.vue'
 import Sidebar from './components/Sidebar.vue'
@@ -65,7 +65,27 @@ import StatusPanel from './components/StatusPanel.vue'
 const store = useECGStore()
 const showPoincareWindow = ref(false)
 
+function handleKeydown(event) {
+  // Ignore if user is typing in an input field
+  if (event.target.tagName === 'INPUT' || event.target.tagName === 'SELECT' || event.target.tagName === 'TEXTAREA') {
+    return
+  }
+
+  if (event.key === 'ArrowLeft') {
+    event.preventDefault()
+    store.navigate('left')
+  } else if (event.key === 'ArrowRight') {
+    event.preventDefault()
+    store.navigate('right')
+  }
+}
+
 onMounted(async () => {
   await store.loadFiles()
+  window.addEventListener('keydown', handleKeydown)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeydown)
 })
 </script>
