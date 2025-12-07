@@ -173,22 +173,23 @@ watch(() => store.files, (files) => {
 }
 
 .sidebar.collapsed {
-  width: 0;
-  border: none;
-  background: transparent;
-  box-shadow: none;
+  width: 28px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
 }
 
 .sidebar-toggle {
   position: absolute;
-  right: -14px;
-  top: 50%;
-  transform: translateY(-50%);
+  right: 0;
+  top: 0;
   width: 28px;
-  height: 56px;
+  height: 28px;
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  border: none;
+  border-left: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+  border-radius: 0 var(--radius-md) 0 var(--radius-sm);
   color: var(--color-text-secondary);
   cursor: pointer;
   display: flex;
@@ -202,11 +203,6 @@ watch(() => store.files, (files) => {
 .sidebar-toggle:hover {
   background: #f5f5f5;
   color: var(--color-text-primary);
-}
-
-.sidebar.collapsed .sidebar-toggle {
-  right: -28px;
-  border-left: 1px solid var(--color-border);
 }
 
 .sidebar-content {

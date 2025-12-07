@@ -31,12 +31,13 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted, nextTick } from 'vue'
+import { ref, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useECGStore } from '../stores/ecg'
 import Plotly from 'plotly.js-dist-min'
 
 const store = useECGStore()
 const plotDiv = ref(null)
+let resizeObserver = null
 
 // Navigation functions
 async function navigateLeft() {
@@ -206,12 +207,27 @@ async function handlePlotClick(data) {
 function renderPlot() {
   if (!plotDiv.value || !store.traceData) return
 
+  // Clean up previous observer
+  if (resizeObserver) {
+    resizeObserver.disconnect()
+  }
+
   const { traces, layout } = createFoldedFigure(store.traceData)
 
   Plotly.newPlot(plotDiv.value, traces, layout, {
-    responsive: true,
+    responsive: false,
     displayModeBar: false
   })
+
+  // Handle resize manually - only update width, preserve calculated height
+  resizeObserver = new ResizeObserver(() => {
+    if (plotDiv.value) {
+      Plotly.relayout(plotDiv.value, {
+        width: plotDiv.value.clientWidth
+      })
+    }
+  })
+  resizeObserver.observe(plotDiv.value)
 
   // Add click handler
   plotDiv.value.on('plotly_click', handlePlotClick)
@@ -225,6 +241,12 @@ watch(() => store.traceData, async () => {
 onMounted(() => {
   if (store.traceData) {
     renderPlot()
+  }
+})
+
+onUnmounted(() => {
+  if (resizeObserver) {
+    resizeObserver.disconnect()
   }
 })
 </script>
@@ -256,8 +278,13 @@ onMounted(() => {
 }
 
 .plot-container {
-  min-height: 400px;
   width: 100%;
+}
+
+.plot-container :deep(.js-plotly-plot),
+.plot-container :deep(.plot-container),
+.plot-container :deep(.svg-container) {
+  width: 100% !important;
 }
 
 .loading-state {
