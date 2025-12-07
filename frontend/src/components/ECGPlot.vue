@@ -14,8 +14,13 @@
         <v-icon size="48">mdi-chevron-left</v-icon>
       </button>
 
-      <div v-if="store.traceData" ref="plotDiv" class="plot-container"></div>
+      <div v-if="store.traceData" ref="plotDiv" class="plot-container" :class="{ 'loading-dim': store.loadingTrace }"></div>
       <div v-else class="loading-state">Loading ECG data...</div>
+
+      <!-- Loading overlay -->
+      <div v-if="store.loadingTrace && store.traceData" class="loading-overlay">
+        <v-progress-circular indeterminate size="48" width="4" color="primary"></v-progress-circular>
+      </div>
 
       <!-- Right navigation arrow -->
       <button
@@ -279,6 +284,11 @@ onUnmounted(() => {
 
 .plot-container {
   width: 100%;
+  transition: opacity 0.2s ease;
+}
+
+.plot-container.loading-dim {
+  opacity: 0.4;
 }
 
 .plot-container :deep(.js-plotly-plot),
@@ -332,5 +342,14 @@ onUnmounted(() => {
 .nav-arrow-right {
   right: 16px;
   border-radius: var(--radius-sm);
+}
+
+.loading-overlay {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100;
+  pointer-events: none;
 }
 </style>

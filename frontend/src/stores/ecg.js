@@ -18,6 +18,7 @@ export const useECGStore = defineStore('ecg', {
 
     // UI state
     loading: false,
+    loadingTrace: false,
     error: null,
     saveStatus: null,
 
@@ -96,6 +97,7 @@ export const useECGStore = defineStore('ecg', {
     },
 
     async fetchTrace() {
+      this.loadingTrace = true
       try {
         const result = await api.getTrace(this.position, this.windowLength)
         if (result.success) {
@@ -103,6 +105,8 @@ export const useECGStore = defineStore('ecg', {
         }
       } catch (error) {
         this.error = error.message
+      } finally {
+        this.loadingTrace = false
       }
     },
 
