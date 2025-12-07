@@ -190,11 +190,17 @@ button:disabled {
   min-height: 400px;
 }
 
-.poincare-toggle-container {
+.main-content {
   display: flex;
-  align-items: center;
-  padding: 20px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.ecg-area {
+  flex: 1;
+  min-width: 0;
+}
+
+.poincare-toggle-row {
+  margin-bottom: 0;
 }

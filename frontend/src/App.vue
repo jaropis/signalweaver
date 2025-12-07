@@ -12,16 +12,26 @@
     </div>
 
     <template v-else>
-      <!-- Controls and Poincare Toggle Row -->
-      <div class="row">
-        <div class="col-4">
-          <ControlPanel />
-        </div>
-        <div class="col-8 poincare-toggle-container">
-          <PoincareToggle
-            :isOpen="showPoincareWindow"
-            @toggle="showPoincareWindow = !showPoincareWindow"
-          />
+      <!-- Main content area with sidebar -->
+      <div class="main-content">
+        <!-- Sidebar -->
+        <Sidebar />
+
+        <!-- ECG area -->
+        <div class="ecg-area">
+          <!-- Poincare Toggle - directly above ECG panel -->
+          <div class="poincare-toggle-row">
+            <PoincareToggle
+              :isOpen="showPoincareWindow"
+              @toggle="showPoincareWindow = !showPoincareWindow"
+            />
+          </div>
+
+          <!-- ECG Plot -->
+          <ECGPlot />
+
+          <!-- Status/Save -->
+          <StatusPanel />
         </div>
       </div>
 
@@ -37,15 +47,6 @@
       >
         <PoincarePlot />
       </FloatingWindow>
-
-      <!-- Navigation -->
-      <NavigationPanel />
-
-      <!-- ECG Plot -->
-      <ECGPlot />
-
-      <!-- Status/Save -->
-      <StatusPanel />
     </template>
   </div>
 </template>
@@ -54,11 +55,10 @@
 import { ref, onMounted } from 'vue'
 import { useECGStore } from './stores/ecg'
 import Header from './components/Header.vue'
-import ControlPanel from './components/ControlPanel.vue'
+import Sidebar from './components/Sidebar.vue'
 import PoincareToggle from './components/PoincareToggle.vue'
 import FloatingWindow from './components/FloatingWindow.vue'
 import PoincarePlot from './components/PoincarePlot.vue'
-import NavigationPanel from './components/NavigationPanel.vue'
 import ECGPlot from './components/ECGPlot.vue'
 import StatusPanel from './components/StatusPanel.vue'
 

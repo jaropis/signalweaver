@@ -6,7 +6,7 @@
     :title="isOpen ? 'Close Poincaré Plot' : 'Open Poincaré Plot'"
   >
     <span class="toggle-icon">{{ isOpen ? '−' : '+' }}</span>
-    <span class="toggle-text">Poincaré Plot</span>
+    <span class="toggle-text">Poincaré</span>
   </button>
 </template>
 
@@ -25,22 +25,21 @@ defineEmits(['toggle'])
 .poincare-toggle {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
+  gap: 4px;
+  padding: 4px 8px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 4px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 11px;
   font-weight: 500;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 1px 4px rgba(102, 126, 234, 0.3);
 }
 
 .poincare-toggle:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 2px 6px rgba(102, 126, 234, 0.4);
 }
 
 .poincare-toggle.is-open {
@@ -51,11 +50,11 @@ defineEmits(['toggle'])
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
+  width: 14px;
+  height: 14px;
   background: rgba(255, 255, 255, 0.2);
-  border-radius: 4px;
-  font-size: 16px;
+  border-radius: 2px;
+  font-size: 12px;
   font-weight: bold;
 }
 
