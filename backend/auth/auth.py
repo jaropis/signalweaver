@@ -6,7 +6,7 @@ from flask_jwt_extended import create_access_token, create_refresh_token
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.exc import IntegrityError
 
-from config import AuthConfig
+from ..config import AuthConfig
 from models import (
     User, RefreshToken, BlacklistedTokens, DatabaseManager
 )

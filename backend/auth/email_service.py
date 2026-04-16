@@ -2,7 +2,7 @@
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from config import AuthConfig
+from ..config import AuthConfig
 from exceptions import EmailSendError
 
 class EmailService:
