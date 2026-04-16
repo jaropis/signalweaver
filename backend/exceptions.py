@@ -42,3 +42,7 @@ class WeakPasswordError(AuthError):
     pass
 
 
+class UserNotVerifiedError(AuthError):
+    """Raised when a user has not verified their password."""
+    pass
+

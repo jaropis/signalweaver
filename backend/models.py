@@ -128,7 +128,7 @@ class DatabaseManager:
 
     def __init__(self, database_url:str = None):
         if database_url is None:
-            database_url = "sqlite:///users.db"ConnectionRefusedError
+            database_url = "sqlite:///users.db"
 
         self.engine = create_engine(database_url, echo=False)
         
