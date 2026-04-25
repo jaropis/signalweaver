@@ -9,7 +9,7 @@ from sqlalchemy.orm import sessionmaker, relationship
 from werkzeug.security import check_password_hash, generate_password_hash,check_password_hash
 import uuid
 
-Base = declarative_base
+Base = declarative_base()
 
 class User(Base):
     """
@@ -97,7 +97,7 @@ class RefreshToken(Base):
     )
 
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
-    token_hash = Column(string(255), nullable=False)
+    token_hash = Column(String(255), nullable=False)
     expires_at = Column(DateTime(timezone=True), nullable=False)
     created_at = Column(
         DateTime(timezone=True),

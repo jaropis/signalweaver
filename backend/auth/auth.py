@@ -12,7 +12,7 @@ from .models import (
     User, RefreshToken, BlacklistedTokens, DatabaseManager
 )
 
-from email_service import EmailService
+from .email_service import EmailService
 from utils import ensure_timezone_aware, validate_password_strength, is_common_password
 from exceptions import (
     UserNotFoundError, InvalidCredentialsError, EmailNotVerified, TokenExpiredError, UserAlreadyExistsError, EmailSendError, DatabaseError, WeakPasswordError, AccountLockedError, UserNotVerifiedError
