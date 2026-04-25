@@ -1,13 +1,14 @@
 """Main authentication service - all business logic lives here"""
 
-import secretsfrom datetime import datetime, timedelta, timezone
+import secrets
+from datetime import datetime, timedelta, timezone
 from typing import Optional, Dict, Any
 from flask_jwt_extended import create_access_token, create_refresh_token
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.exc import IntegrityError
 
-from ..config import AuthConfig
-from models import (
+from .config import AuthConfig
+from .models import (
     User, RefreshToken, BlacklistedTokens, DatabaseManager
 )
 
@@ -296,7 +297,7 @@ class AuthService:
         # creating new tokens
         new_access_token = create_access_token(identity=current_user_email)
         # store new refresh token hash
-        expires_at = datetime.now(timezone.utc) + self.config.refresh_token_expires)
+        expires_at = datetime.now(timezone.utc + self.config.refresh_token_expires)
 
         new_refresh_token_obj = RefreshToken(
             user_id=user.id,

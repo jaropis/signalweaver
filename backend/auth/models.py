@@ -19,7 +19,7 @@ class User(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     email = Column(String(255), unique=True, nullable=False, index=True)
-    password_hash = Colunmn(String(255), nullable=False)
+    password_hash = Column(String(255), nullable=False)
     email_verified = Column(Boolean, default=False, nullable=False)
     verification_token = Column(String(255), nullable=True)
     verification_expires = Column(DateTime(timezone=True), nullable=True)
@@ -39,7 +39,7 @@ class User(Base):
     refresh_tokens = relationship(
         "RefreshToken",
         back_populates="user",
-        cascade="all delete-orphan"
+        cascade="all, delete-orphan"
     )
 
     def set_password(self, password: str) -> None:
@@ -96,7 +96,7 @@ class RefreshToken(Base):
         default=lambda: str(uuid.uuid4())
     )
 
-    user_id = Column(Integer, ForeignKey('users.id') nullable=False)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     token_hash = Column(string(255), nullable=False)
     expires_at = Column(DateTime(timezone=True), nullable=False)
     created_at = Column(
