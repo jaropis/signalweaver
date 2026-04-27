@@ -1,11 +1,10 @@
 """Flask blueprint for authentication endpoints."""
 from os import link
 from flask import Blueprint, request, jsonify
-from backend.auth.exceptions import AccountLockedError, DatabaseError, EmailSendError, InvalidCredentialsError, UserAlreadyExistsError, UserNotFoundError, WeakPasswordError
-from flask_jwt_extend import jwt_required, get_jwt_identity, get_jwt
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 
-from auth import AuthService
-from exceptionsEmailNotVerifiedError,  importInvalidCredentialsError,  (
+from .auth import AuthService
+from .exceptions  import  (
     UserNotFoundError, InvalidCredentialsError, EmailNotVerifiedError,
     TokenExpiredError, UserAlreadyExistsError, EmailSendError,
     AccountLockedError, WeakPasswordError, DatabaseError
@@ -125,6 +124,16 @@ def create_auth_blueprint(auth_service: AuthService, name: str = 'auth', limiter
                    }), 400
            result = auth_service.verify_email(token)
            return jsonify(result), 200
+       except UserNotFoundError:
+           return jsonify({
+               'error': 'Invalid verification token'
+           }), 400
+       except TokenExpiredError as e:
+           return jsonify({
+               'error': str(e)
+           }), 400
+       except Exception as e:
+           return jsonify({'error': str(e)}), 500
 
     # POST /auth/resend-verification
     @bp.route('/resend-verification', methods=['POST'])
@@ -148,7 +157,7 @@ def create_auth_blueprint(auth_service: AuthService, name: str = 'auth', limiter
             return jsonify({'error': str(e)}), 500
 
     # POST /auth/refresh
-    @b.route('/refresh', methods=['POST'])
+    @bp.route('/refresh', methods=['POST'])
     @jwt_required(refresh=True)
     def refresh():
         """

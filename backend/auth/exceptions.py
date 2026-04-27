@@ -17,7 +17,7 @@ class EmailNotVerifiedError(AuthError):
     """Raised when a user tries to log in without verifying their email."""
     pass
 
-class TokeExpiredError(AuthError):
+class TokenExpiredError(AuthError):
     """Raised when a verification of reset token has expired."""
     pass
 

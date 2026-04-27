@@ -122,3 +122,10 @@ AVA*
 data/*
 
 CLAUDE.md
+
+# database files
+*.db
+
+# emacs files
+\#*
+.\#*

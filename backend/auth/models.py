@@ -135,6 +135,9 @@ class DatabaseManager:
         #SessionLocal is a factory -calling it creates a new sessionmaker
         self.SessionLocal = sessionmaker(
             autocommit=False, autoflush=False, bind=self.engine)
+    def create_tables(self) -> None:
+        """Create all tables if they don't exist yet."""
+        Base.metadata.create_all(bind=self.engine)
         
     def get_session(self):
         """
